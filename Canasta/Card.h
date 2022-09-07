@@ -1,18 +1,19 @@
 #pragma once
+#include <string>
+#include <vector>
+
 class Card {
 public: 
 	Card();
-	
-	
-	enum Suit : unsigned char {Hearts = 'H', Clubs = 'C', Spades = 'S', Diamond = 'D',};
-	enum Rank : unsigned char {
-		Begin, One = '1', Two = '2', Three = '3', Four = '4', Five = '5', 
-		Six = '6', Seven = '7', Eight = '8', Nine = '9', Ten = 'X',
-		Ace = 'A', Jack = 'J', Queen = 'Q', King = 'K', End
-	};
-	Card(Card::Suit suit, Card::Rank rank );
+	Card(int suit, int face);
+	Card(char face, char suit, std::string string_reprensentation, int point_value);
+	void calculate_point_value(char face, char value);
+	void translate_to_symbolic_rep(int face, int value);
 
 private: 
-	unsigned char rank;
-	unsigned char suit;
+	char face;
+	char suit;
+	std::string string_representation;
+	int point_value;
+
 };
