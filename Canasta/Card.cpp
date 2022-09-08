@@ -251,4 +251,41 @@ int Card::get_point_value() const
 	return point_value;
 }
 
+/* *********************************************************************
+Function Name: isWild()
+Purpose: Returns if the current card is a wild card or not. 
+Parameters: none
+Return Value: bool for if the current card is a wild card or not.
+Assistance Received: none
+********************************************************************* */
+bool Card::isWild() const {
+	if (face == '2' || suit == 'J')
+		return true;
+	else
+		return false;
+}
 
+/* *********************************************************************
+Function Name: isSpecial()
+Purpose: Returns if the current card is a special card
+Parameters: none
+Return Value: bool for if the current card is a special card or not.
+Assistance Received: none
+********************************************************************* */
+bool Card::isSpecial() const {
+	if (face == '3')
+		return true;
+	else
+		return false;
+}
+
+/* *********************************************************************
+Function Name: isNatural()
+Purpose: Returns if the current card is a natural card
+Parameters: none
+Return Value: bool for if the current card is a natural card or not.
+Assistance Received: none
+********************************************************************* */
+bool Card::isNatural() const {
+	return (!(isSpecial() && isWild()));
+}

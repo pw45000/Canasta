@@ -18,6 +18,7 @@ public:
 	void create_stock_pile();
 	void shuffle_stock();
 	Card draw(std::string pile_to_draw);
+	std::vector<Card> pick_up_discard();
 private: 
 	//While it was tempting to use a deque
 	//since the datastructure not only sounds like a deck

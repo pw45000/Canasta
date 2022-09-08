@@ -23,6 +23,9 @@ public:
 	std::string get_card_string() const;
 	int get_point_value() const;
 
+	bool isWild() const;
+	bool isSpecial() const; 
+	bool isNatural() const;
 
 private: 
 	char face;

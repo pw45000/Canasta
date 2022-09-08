@@ -63,4 +63,12 @@ Card Deck::draw(std::string pile_to_draw)
 	}
 }
 
+std::vector<Card> Deck::pick_up_discard()
+{
+	//might switch this to merge with draw depending on the UI of the program. 
+	std::vector<Card> picked_discard = discard_pile;
+	discard_pile.clear();
+	return discard_pile;
+}
+
 

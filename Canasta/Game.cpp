@@ -9,9 +9,11 @@
 #include <vector>
 #include "Card.h"
 #include "Deck.h"
+#include "Hand.h"
 #include <random>
 #include <algorithm>
 int main()
 {
 	Deck maindeck;
+	Hand my_test_hand;
 }
