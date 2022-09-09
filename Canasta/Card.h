@@ -34,3 +34,6 @@ private:
 	int point_value;
 
 };
+
+//one of the only functions not added within the class. This is because we need a binary comparison.
+bool operator== (const Card card1, const Card card2);

@@ -20,6 +20,7 @@ Deck::Deck() {
 		discard_pile.push_back(draw("Stock"));
 }
 
+
 void Deck::create_stock_pile()
 {
 	for (int decks = 0; decks < 2; decks++)
@@ -70,5 +71,7 @@ std::vector<Card> Deck::pick_up_discard()
 	discard_pile.clear();
 	return discard_pile;
 }
+
+
 
 

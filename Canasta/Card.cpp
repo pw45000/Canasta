@@ -259,7 +259,9 @@ Return Value: bool for if the current card is a wild card or not.
 Assistance Received: none
 ********************************************************************* */
 bool Card::isWild() const {
-	if (face == '2' || suit == 'J')
+	//Jokers are notated as J1, J2, so their
+	//suit is numeric. 
+	if (face == '2' || isdigit(suit))
 		return true;
 	else
 		return false;
@@ -288,4 +290,12 @@ Assistance Received: none
 ********************************************************************* */
 bool Card::isNatural() const {
 	return (!(isSpecial() && isWild()));
+}
+
+bool operator==(const Card card1, const Card card2)
+{
+	if (card1.get_card_string() == card2.get_card_string())
+		return true;
+	else
+		return false;
 }
