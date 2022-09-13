@@ -13,11 +13,11 @@ Deck::Deck() {
 
 	shuffle_stock();
 
-	Card first_discard = draw("Stock");
+	Card first_discard = draw_from_stock();
 	discard_pile.push_back(first_discard);
 	//If the card is a red three, draw another card.
-	if (first_discard.get_card_string() == "3H" || first_discard.get_card_string() =="3D")
-		discard_pile.push_back(draw("Stock"));
+	if (first_discard.get_card_string() == "3H" || first_discard.get_card_string() =="3D" || first_discard.isWild())
+		discard_pile.push_back(draw_from_stock());
 }
 
 
@@ -46,30 +46,37 @@ void Deck::shuffle_stock()
 
 }
 
-Card Deck::draw(std::string pile_to_draw)
+Card Deck::draw_from_stock()
 {
 	Card card_drawn;
-	if (pile_to_draw == "Stock") {
-		card_drawn = *(stock_pile.begin());
-	   stock_pile.erase(stock_pile.begin());
-		return card_drawn;
-	}
-	else if (pile_to_draw == "Discard") {
-		card_drawn = *(discard_pile.begin());
-		discard_pile.erase(discard_pile.begin());
-		return card_drawn;
-	}
-	else {
-		return card_drawn;
-	}
+	//dereference the .begin() iterator. 
+	//while I could've used the 0 index,
+	//this seems to be a lot more intuitive.
+	card_drawn = *(stock_pile.begin());
+	stock_pile.erase(stock_pile.begin());
+	return card_drawn;
 }
 
-std::vector<Card> Deck::pick_up_discard()
-{
+
+std::vector<Card> Deck::draw_from_discard() {
 	//might switch this to merge with draw depending on the UI of the program. 
 	std::vector<Card> picked_discard = discard_pile;
 	discard_pile.clear();
 	return discard_pile;
+}
+
+void Deck::discard(Card discarded_card)
+{
+	if (discarded_card.get_card_string() == "3S" || discarded_card.get_card_string() == "3C") {
+		discard_is_frozen = true;
+	}
+	else if (discard_is_frozen && discarded_card.isNatural()) {
+		discard_is_frozen = false;
+	}
+	
+	discard_pile.push_back(discarded_card);
+
+
 }
 
 

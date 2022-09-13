@@ -1,3 +1,4 @@
+#include "Game.h"
 /* ***********************************************************
 * Name:  Patrick Wierzbicki*
 * Project : Cansta P1*
@@ -5,39 +6,78 @@
 * Date : 9/13/22*
 *********************************************************** */
 
-#include <iostream>
-#include <vector>
-#include "Card.h"
-#include "Deck.h"
-#include "Hand.h"
-#include <random>
-#include <algorithm>
-int main()
+Game::Game()
 {
-	Deck maindeck;
+	round = 0;
 
-	std::vector<Card> a;
-	auto x = (Card(0, 7));
-	auto y = (Card(0, 7));
-   auto z = (Card(0, 7));
-	//auto add = Card('J', '1', "J1", 50);
-	auto add = Card(0, 7);
+}
 
+void Game::main_menu()
+{
+	std::string input_string;
+	std::cout << "Welcome to Canasta! Please pick an option:" << std::endl;
+	std::cout << "1. New Game " << std::endl;
+	std::cout << "2. Load Game" << std::endl;
+	std::cout << "3. Exit" << std::endl;
 
-	auto x1 = (Card(0, 7));
-	auto y2 = (Card(0, 7));
-	auto z2 = (Card(0, 7));
-
-	Hand my_test_hand;
-
-	/*
-	for (int i = 0; i < 15; i++) {
-		my_test_hand.append_hand((maindeck.draw("Stock")));
-	}
-	*/
 	
-	bool issucc = my_test_hand.create_meld(x, y, z);
-	bool issucc2 = my_test_hand.create_meld(x1, y2, z2);
-	bool issucc3 = my_test_hand.lay_off(add, 2, add.isWild());
-	bool issucc4 = my_test_hand.transfer_wild_card(add, 2, 1);
+	
+	do {
+		std::cin >> input_string;
+		if (input_string == "1") {
+			std::cin.clear();
+			choose_player_type();
+
+			//scrappy way of redisplaying the prompt. 
+			std::cout << "Welcome to Canasta! Please pick an option:" << std::endl;
+			std::cout << "1. New Game " << std::endl;
+			std::cout << "2. Load Game" << std::endl;
+			std::cout << "3. Exit" << std::endl;
+		}
+		else if (input_string == "2")
+			std::cout << "TODO: IMPLEMENT LOAD" << std::endl;
+		else if (input_string == "3")
+			//We'll need this, or there's some weird behavior with recursion....
+			exit(0);
+		else {
+			std::cout << "That's not a valid option. Please pick from one of the above!" << std::endl;
+		}
+	}
+	while (input_string != "3");
+
+}
+
+void Game::choose_player_type()
+{
+	std::string input_string;
+	std::cout << "Welcome to Canasta! Please select your preferred game type: " << std::endl;
+	std::cout << "1. Player vs Player (PVP) " << std::endl;
+	std::cout << "2. Player vs Computer (PVE)" << std::endl;
+	std::cout << "3. Exit to Main Menu" << std::endl;
+
+
+	do {
+		std::cin >> input_string;
+
+		if (input_string == "1") {
+			Human player1;
+			Human player2;
+
+			//I was getting an error before because I forgot to 
+			//set Human as a derived class as player. 
+			players.push_back(&player1);
+			players.push_back(&player2);
+			Round x;
+			x.coin_toss();
+			return;
+		}
+		else if (input_string == "2")
+			std::cout << "TODO: IMPLEMENT PVE" << std::endl;
+		else if (input_string == "3")
+			return;
+		else {
+			std::cout << "That's not a valid option. Please pick from one of the above!" << std::endl;
+		}
+	} 
+	while (input_string != "3");
 }
