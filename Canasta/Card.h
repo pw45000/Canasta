@@ -27,7 +27,7 @@ public:
 	bool isSpecial() const; 
 	bool isNatural() const;
 
-private: 
+private:  
 	char face;
 	char suit;
 	std::string string_representation;

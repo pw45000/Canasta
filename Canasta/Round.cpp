@@ -35,3 +35,42 @@ int Round::coin_toss()
 	//https://stackoverflow.com/questions/59644856/measuring-time-to-generate-better-random-numbers-in-c
 
 }
+
+Round::Round()
+{
+	player_1_score = 0;
+	player_2_score = 0;
+}
+
+Round::Round(Human player1, Human player2)
+{
+	players.push_back(&player1);
+	players.push_back(&player2);
+	player_1_score = 0;
+	player_2_score = 0;
+}
+
+Round::Round(Human player1, Computer player2)
+{
+	players.push_back(&player1);
+	players.push_back(&player2);
+	player_1_score = 0;
+	player_2_score = 0;
+}
+
+Round::Round(const Round& other_round)
+{
+	this->next_player = other_round.next_player;
+	this->stock_and_discard = other_round.stock_and_discard;
+	this->player_1_score = other_round.player_1_score;
+	this->player_2_score = other_round.player_2_score;
+	this->players = other_round.players;
+
+}
+
+Round::~Round()
+{
+	for (int itr = 0; itr < players.size(); itr++) {
+		delete players.at(itr);
+	}
+}

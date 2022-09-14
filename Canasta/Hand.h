@@ -3,7 +3,7 @@
 #include <vector>
 #include "Deck.h"
 #include "Card.h"
-
+#include <iostream>
 
 //To extract a card, the iterator looks verbose. 
 //A typedef will hope to fix this.
@@ -22,6 +22,8 @@ public:
 	bool is_canasta(int meld_number);
 	bool is_not_duplicate_meld(char rank);
 	int calculate_meld_points(int meld_number);
+	void print_hand(); 
+	void print_melds();
 	private:
 	std::vector<std::vector<Card>> meld_container;
 	std::vector<Card> hand_container;

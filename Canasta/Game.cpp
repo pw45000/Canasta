@@ -66,9 +66,7 @@ void Game::choose_player_type()
 			//I was getting an error before because I forgot to 
 			//set Human as a derived class as player. 
 			players.push_back(&player1);
-			players.push_back(&player2);
-			Round x;
-			x.coin_toss();
+			players.push_back(&player2); 
 			return;
 		}
 		else if (input_string == "2")

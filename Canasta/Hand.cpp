@@ -218,11 +218,19 @@ bool Hand::is_not_duplicate_meld(char rank)
 
 int Hand::calculate_meld_points(int meld_number)
 {
-	int meld_points;
+	int meld_points = 0;
 	std::vector<Card> meld_target = meld_container.at(meld_number);
 
 	for (card_itr card = meld_target.begin(); card != meld_target.end(); card++) {
 		meld_points += card->get_point_value();
+	}
+	return meld_points;
+}
+
+void Hand::print_hand()
+{
+	for (Card hand_card : hand_container) {
+		std::cout << hand_card.get_card_string() << std::endl;
 	}
 }
 
