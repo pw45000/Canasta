@@ -22,7 +22,9 @@ void Game::main_menu()
 
 	int choice = validate_option_based_input(1, 3);
 	
-	switch(choice) {
+	//to avoid stopping after the first return to main menu.
+	do {
+		switch (choice) {
 		case 1:
 			choose_player_type();
 
@@ -35,12 +37,15 @@ void Game::main_menu()
 			break;
 		case 2:
 			std::cout << "TODO: IMPLEMENT LOAD" << std::endl;
+			return;
+			break;
 		case 3:
 			//We'll need this, or there's some weird behavior with recursion....
-			exit(0);
-		default: 
+			return;
+		default:
 			std::cout << "Unknown behavior: unknown option." << std::endl;
-	}
+		}
+	} while (choice != 3);
 
 }
 
@@ -52,10 +57,13 @@ void Game::choose_player_type()
 	std::cout << "2. Player vs Computer (PVE)" << std::endl;
 	std::cout << "3. Exit to Main Menu" << std::endl;
 
-	//because we have 3 options.
-	int choice = validate_option_based_input(1, 3);
-
-	switch (choice) {
+	
+	int choice;
+	//to avoid stopping after the first return to main menu.
+	do {
+		//because we have 3 options.
+		choice = validate_option_based_input(1, 3);
+		switch (choice) {
 		case 1:
 			//bypass the error of case transfer skipping initialization
 		{
@@ -79,22 +87,25 @@ void Game::choose_player_type()
 		default:
 			std::cout << "Unknown behavior: unknown option." << std::endl;
 			break;
-	}
+		}
+	} while (choice != 3);
 }
 
 void Game::main_game()
 {
-	int choice;
-
+	int choice = 0;
+	int round_number = 0;
 
 	do {
-		Round game_round(players);
+		round_number++;
+		Round game_round(players, round_number);
 		game_round.main_round();
 		std::cout << "Would you like to play again?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
 	} while (choice != 2);
+	players.clear();
 }
 
 //https://stackoverflow.com/questions/20814703/should-i-delete-static-object-in-c

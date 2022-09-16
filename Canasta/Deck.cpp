@@ -13,11 +13,13 @@ Deck::Deck() {
 
 	shuffle_stock();
 
-	Card first_discard = draw_from_stock();
-	discard_pile.push_back(first_discard);
+	Card first_discard;
 	//If the card is a red three, draw another card.
-	if (first_discard.get_card_string() == "3H" || first_discard.get_card_string() =="3D" || first_discard.isWild())
-		discard_pile.push_back(draw_from_stock());
+	do {
+		first_discard = draw_from_stock();
+		discard_push_front(first_discard);
+	}
+	while (first_discard.is_red_three() || first_discard.isWild());
 }
 
 
@@ -60,10 +62,11 @@ Card Deck::draw_from_stock()
 
 std::vector<Card> Deck::draw_from_discard() {
 	//might switch this to merge with draw depending on the UI of the program. 
-	std::vector<Card> picked_discard = discard_pile;
-	discard_pile.clear();
 	return discard_pile;
 }
+
+
+
 
 void Deck::discard(Card discarded_card)
 {
@@ -74,7 +77,7 @@ void Deck::discard(Card discarded_card)
 		discard_is_frozen = false;
 	}
 	
-	discard_pile.push_back(discarded_card);
+	discard_push_front(discarded_card);
 
 
 }
@@ -89,6 +92,11 @@ bool Deck::discard_is_empty()
 	return discard_pile.size() == 0;
 }
 
+bool Deck::both_piles_are_empty()
+{
+	return (stock_is_empty() && discard_is_empty());
+}
+
 bool Deck::get_discard_is_frozen()
 {
 	return discard_is_frozen;
@@ -99,9 +107,37 @@ Card Deck::get_top_discard_pile()
 	return *discard_pile.begin();
 }
 
+void Deck::print_stock_pile()
+{
+	for (Card card : stock_pile)
+		std::cout << card.get_card_string() << " ";
+	std::cout << std::endl;
+}
+
+//learn to f11....
+void Deck::print_top_of_discard_pile()
+{
+	if (discard_is_empty()==false)
+		std::cout << discard_pile.at(0).get_card_string() << std::endl;
+	else {
+		std::cout << std::endl;
+	}
+}
+
+void Deck::discard_push_front(Card pushed_card)
+{
+	discard_pile.insert(discard_pile.begin(), pushed_card);
+}
+
+
 void Deck::set_discard_freeze(bool is_frozen)
 {
 	discard_is_frozen = is_frozen;
+}
+
+void Deck::clear_discard()
+{
+	discard_pile = {};
 }
 
 

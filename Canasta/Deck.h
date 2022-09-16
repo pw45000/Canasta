@@ -10,7 +10,7 @@
 #include "Card.h"
 #include <chrono>
 #include <random>
-
+#include <iostream>
 
 class Deck {
 public:
@@ -22,9 +22,14 @@ public:
 	void discard(Card discarded_card);
 	bool stock_is_empty();
 	bool discard_is_empty();
+	bool both_piles_are_empty();
 	bool get_discard_is_frozen();
 	Card get_top_discard_pile();
+	void print_stock_pile();
+	void print_top_of_discard_pile();
+	void discard_push_front(Card pushed_card);
 	void set_discard_freeze(bool is_frozen);
+	void clear_discard();
 private: 
 	//While it was tempting to use a deque
 	//since the datastructure not only sounds like a deck

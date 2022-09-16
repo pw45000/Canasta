@@ -2,8 +2,9 @@
 #include "Player.h"
 class Human : public Player {
 public: 
-	void play() ;
-	bool draw(Deck draw_decks) ;
+	void play(Deck& draw_decks) override ;
+	bool draw(Deck &draw_decks) override;
 	void meld() ;
-	void discard() ;
+	void discard();
+	void print_player_type() override;
 };

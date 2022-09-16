@@ -158,6 +158,7 @@ bool Hand::create_meld(Card red_three)
 bool Hand::is_meldable(Card discard_head)
 {
 	int compatible_cards = 0;
+	int wild_cards = 0;
 	if (discard_head.isSpecial()) {
 		if (discard_head.get_card_suit() == 'H' || discard_head.get_card_suit() == 'D')
 			return true;
@@ -175,8 +176,14 @@ bool Hand::is_meldable(Card discard_head)
 		return false;
 	}
 	else {
-		compatible_cards = std::count(hand_container.begin(), hand_container.end(), discard_head);
-		if (compatible_cards >= 2)
+		for (int card = 0; card < hand_container.size(); card++) {
+			if (hand_container.at(card).isWild())
+				wild_cards = wild_cards + 1;
+			if (hand_container.at(card).get_card_face() == discard_head.get_card_face())
+				compatible_cards++;
+		}
+		
+		if ((compatible_cards>=1 && wild_cards >= 1) || (compatible_cards == 2))
 			return true;
 		else
 			return false;
@@ -245,12 +252,45 @@ int Hand::calculate_meld_points(int meld_number)
 void Hand::print_hand()
 {
 	for (Card hand_card : hand_container) {
-		std::cout << hand_card.get_card_string() << std::endl;
+		std::cout << hand_card.get_card_string() << " ";
 	}
+	std::cout << std::endl;
+}
+
+void Hand::print_melds()
+{
+	for (int meld = 0; meld < meld_container.size(); meld++) {
+		std::cout << "[ ";
+		for (int card = 0; card < meld_container.at(meld).size(); card++) {
+			Card card_to_print = meld_container.at(meld).at(card);
+			std::cout << card_to_print.get_card_string() << " ";
+		}
+		std::cout << "] ";
+	}
+	std::cout << std::endl;
+
 }
 
 void Hand::add_to_hand(Card card_to_add)
 {
 	hand_container.push_back(card_to_add);
+}
+
+void Hand::add_to_hand(std::vector<Card> card_to_add)
+{
+	for (card_itr card = card_to_add.begin(); card != card_to_add.end(); card++) {
+		hand_container.push_back(*card);
+	}
+}
+
+void Hand::purge_red_threes()
+{
+	for (int itr = 0; itr < hand_container.size(); itr++) {
+		std::string card_string = hand_container.at(itr).get_card_string();
+		if (card_string == "3H" || card_string == "3D") {
+			Card red_three = hand_container.at(itr);
+			create_meld(red_three);
+		}
+	}
 }
 

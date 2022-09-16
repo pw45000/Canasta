@@ -45,6 +45,10 @@ int main() {
 	bool canMeld = my_test_hand.is_meldable(black_three);
 	*/
 	
+	
+	//auto add = Card('J', '1', "J1", 50);
+	//std::cout << add.isWild() << std::endl;;
+
 	Game Canasta;
 	Canasta.main_menu();
 

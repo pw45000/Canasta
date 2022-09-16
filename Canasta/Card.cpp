@@ -66,7 +66,32 @@ Card::Card(char face, char suit, std::string string_reprensentation, int point_v
 	//strings cannot be constructor initialized, 
 	//so they need to be set manually.
 	this->string_representation = string_reprensentation;
-};
+}
+Card::Card(const Card& other_card)
+{
+	point_value = other_card.get_point_value();
+	face = other_card.get_card_face();
+	suit = other_card.get_card_suit();
+	string_representation = other_card.get_card_string();
+}
+
+Card Card::operator=(const Card& other_card)
+{
+	point_value = other_card.get_point_value();
+	face = other_card.get_card_face();
+	suit = other_card.get_card_suit();
+	string_representation = other_card.get_card_string();
+	return *this;
+}
+
+Card::~Card()
+{
+	face = '0';
+	suit = '0';
+	string_representation = "";
+	point_value = 0;
+}
+
 
 
 
@@ -290,6 +315,14 @@ Assistance Received: none
 ********************************************************************* */
 bool Card::isNatural() const {
 	return (!(isSpecial() && isWild()));
+}
+
+bool Card::is_red_three() const
+{
+	if (string_representation == "3H" || string_representation == "3D")
+		return true;
+	else
+		return false;
 }
 
 bool operator==(const Card card1, const Card card2)

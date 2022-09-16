@@ -14,6 +14,9 @@ public:
 	Card();
 	Card(int suit, int face);
 	Card(char face, char suit, std::string string_reprensentation, int point_value);
+	Card(const Card& other_card);
+	Card operator=(const Card& other_card);
+	~Card();
 	
 	void translate_to_symbolic_rep(int face, int value);
 	void calculate_point_value(char face, char value);
@@ -26,6 +29,7 @@ public:
 	bool isWild() const;
 	bool isSpecial() const; 
 	bool isNatural() const;
+	bool is_red_three() const;
 
 private:  
 	char face;

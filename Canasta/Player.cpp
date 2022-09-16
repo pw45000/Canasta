@@ -32,9 +32,19 @@ void Player::add_to_hand(Card card_to_be_added)
 	player_hand.add_to_hand(card_to_be_added);
 }
 
+void Player::add_to_hand(std::vector<Card> cards_to_be_added)
+{
+	player_hand.add_to_hand(cards_to_be_added);
+}
+
 void Player::create_special_meld(Card card_to_be_added)
 {
 	player_hand.create_meld(card_to_be_added);
+}
+
+void Player::purge_red_threes()
+{
+	player_hand.purge_red_threes();
 }
 
 Hand Player::get_player_hand()
@@ -42,7 +52,7 @@ Hand Player::get_player_hand()
 	return player_hand;
 }
 
-void Player::play()
+void Player::play(Deck& draw_decks)
 {
 	std::cout << "TODO" << std::endl;
 }

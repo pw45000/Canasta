@@ -10,15 +10,18 @@ public:
 	bool has_canasta();
 	bool hand_empty();
 	void add_to_hand(Card card_to_be_added);
+	void add_to_hand(std::vector<Card> cards_to_be_added);
 	void create_special_meld(Card card_to_be_added);
+	void purge_red_threes();
 	Hand get_player_hand();
 
 
-	virtual void play();
+	virtual void play(Deck& draw_decks) = 0;
 	//virtual void strategy();
-	virtual bool draw(Deck &draw_decks);
+	virtual bool draw(Deck &draw_decks) = 0;
 	virtual void meld();
 	virtual void discard();
+	virtual void print_player_type() = 0;
 private:
 	int score;
 	Hand player_hand;
