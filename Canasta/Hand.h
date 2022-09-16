@@ -21,9 +21,12 @@ public:
 	bool remove_from_hand(Card discard);
 	bool is_canasta(int meld_number);
 	bool is_not_duplicate_meld(char rank);
+	bool hand_empty();
+	bool has_canasta();
 	int calculate_meld_points(int meld_number);
 	void print_hand(); 
 	void print_melds();
+	void add_to_hand(Card card_to_add);
 	private:
 	std::vector<std::vector<Card>> meld_container;
 	std::vector<Card> hand_container;

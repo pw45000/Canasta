@@ -79,6 +79,31 @@ void Deck::discard(Card discarded_card)
 
 }
 
+bool Deck::stock_is_empty()
+{
+	return stock_pile.size() == 0;
+}
+
+bool Deck::discard_is_empty()
+{
+	return discard_pile.size() == 0;
+}
+
+bool Deck::get_discard_is_frozen()
+{
+	return discard_is_frozen;
+}
+
+Card Deck::get_top_discard_pile()
+{
+	return *discard_pile.begin();
+}
+
+void Deck::set_discard_freeze(bool is_frozen)
+{
+	discard_is_frozen = is_frozen;
+}
+
 
 
 

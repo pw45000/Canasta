@@ -20,6 +20,11 @@ public:
 	Card draw_from_stock();
 	std::vector<Card> draw_from_discard();
 	void discard(Card discarded_card);
+	bool stock_is_empty();
+	bool discard_is_empty();
+	bool get_discard_is_frozen();
+	Card get_top_discard_pile();
+	void set_discard_freeze(bool is_frozen);
 private: 
 	//While it was tempting to use a deque
 	//since the datastructure not only sounds like a deck

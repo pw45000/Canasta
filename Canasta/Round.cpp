@@ -36,6 +36,40 @@ int Round::coin_toss()
 
 }
 
+void Round::main_round()
+{
+	auto player1 = players.at(0);
+	auto player2 = players.at(1);
+
+	if (player1->get_score() == player2->get_score()) {
+		coin_toss();
+	}
+	initial_draw();
+	player1->draw(stock_and_discard);
+}
+
+void Round::initial_draw()
+{
+	//for each player, draw 15 cards from the stockpile.
+	int initial_draw_count = 15;
+	for (int itr = 0; itr < players.size(); itr++) {
+		for (int card = 0; card < initial_draw_count; card++) {
+			Card drawn_card = stock_and_discard.draw_from_stock();
+			std::string drawn_string = drawn_card.get_card_string();
+
+			if (drawn_string == "3H" || drawn_string == "3D") {
+				std::cout << "Lucky you! Player " << itr + 1 << ", you got a red three!" << std::endl;
+				players.at(itr)->create_special_meld(drawn_card);
+				card--;
+			}
+			else {
+				players.at(itr)->add_to_hand(drawn_card);
+			}
+		}
+	}
+}
+
+
 Round::Round()
 {
 	player_1_score = 0;
@@ -58,6 +92,15 @@ Round::Round(Human player1, Computer player2)
 	player_2_score = 0;
 }
 
+Round::Round(std::vector<Player*> players)
+{
+	this->players = players;
+	player_1_score = 0;
+	player_2_score = 0;
+}
+
+
+
 Round::Round(const Round& other_round)
 {
 	this->next_player = other_round.next_player;
@@ -68,9 +111,8 @@ Round::Round(const Round& other_round)
 
 }
 
+//https://stackoverflow.com/questions/20814703/should-i-delete-static-object-in-c
+//empty for now due to this.
 Round::~Round()
 {
-	for (int itr = 0; itr < players.size(); itr++) {
-		delete players.at(itr);
-	}
 }

@@ -20,12 +20,10 @@ void Game::main_menu()
 	std::cout << "2. Load Game" << std::endl;
 	std::cout << "3. Exit" << std::endl;
 
+	int choice = validate_option_based_input(1, 3);
 	
-	
-	do {
-		std::cin >> input_string;
-		if (input_string == "1") {
-			std::cin.clear();
+	switch(choice) {
+		case 1:
 			choose_player_type();
 
 			//scrappy way of redisplaying the prompt. 
@@ -33,17 +31,16 @@ void Game::main_menu()
 			std::cout << "1. New Game " << std::endl;
 			std::cout << "2. Load Game" << std::endl;
 			std::cout << "3. Exit" << std::endl;
-		}
-		else if (input_string == "2")
+			choice = validate_option_based_input(1, 3);
+			break;
+		case 2:
 			std::cout << "TODO: IMPLEMENT LOAD" << std::endl;
-		else if (input_string == "3")
+		case 3:
 			//We'll need this, or there's some weird behavior with recursion....
 			exit(0);
-		else {
-			std::cout << "That's not a valid option. Please pick from one of the above!" << std::endl;
-		}
+		default: 
+			std::cout << "Unknown behavior: unknown option." << std::endl;
 	}
-	while (input_string != "3");
 
 }
 
@@ -55,27 +52,89 @@ void Game::choose_player_type()
 	std::cout << "2. Player vs Computer (PVE)" << std::endl;
 	std::cout << "3. Exit to Main Menu" << std::endl;
 
+	//because we have 3 options.
+	int choice = validate_option_based_input(1, 3);
 
-	do {
-		std::cin >> input_string;
-
-		if (input_string == "1") {
+	switch (choice) {
+		case 1:
+			//bypass the error of case transfer skipping initialization
+		{
 			Human player1;
 			Human player2;
-
-			//I was getting an error before because I forgot to 
-			//set Human as a derived class as player. 
 			players.push_back(&player1);
-			players.push_back(&player2); 
+			players.push_back(&player2);
+
+			main_game();
+
+
 			return;
+			break;
 		}
-		else if (input_string == "2")
+		case 2:
 			std::cout << "TODO: IMPLEMENT PVE" << std::endl;
-		else if (input_string == "3")
+			break;
+		case 3:
 			return;
-		else {
-			std::cout << "That's not a valid option. Please pick from one of the above!" << std::endl;
-		}
-	} 
-	while (input_string != "3");
+			break;
+		default:
+			std::cout << "Unknown behavior: unknown option." << std::endl;
+			break;
+	}
 }
+
+void Game::main_game()
+{
+	int choice;
+
+
+	do {
+		Round game_round(players);
+		game_round.main_round();
+		std::cout << "Would you like to play again?" << std::endl;
+		std::cout << "1. Yes" << std::endl;
+		std::cout << "2. No" << std::endl;
+		choice = validate_option_based_input(1, 2);
+	} while (choice != 2);
+}
+
+//https://stackoverflow.com/questions/20814703/should-i-delete-static-object-in-c
+//empty for now due to this.
+Game::~Game()
+{
+}
+
+Game::Game(const Game& other_game)
+{
+	players = other_game.players;
+	round = other_game.round;
+}
+
+int validate_option_based_input(int lower_bound, int upper_bound)
+{
+	std::string input;
+	bool is_valid = false;
+	int converted_option = 0;
+	do {
+		
+		std::cin >> input;
+		
+		if (std::all_of(input.begin(), input.end(), ::isdigit)) {
+			converted_option = std::stoi(input);
+
+			if (converted_option >= lower_bound && converted_option <= upper_bound) {
+				is_valid = true;
+			}
+			else {
+				std::cout << "Input Error: selected number is not an option." << std::endl;
+			}
+		}
+		else {
+			std::cout << "Input Error: inputted string is not numeric." << std::endl;
+		}
+
+	} 
+	while (is_valid != true); 
+	
+	return converted_option;
+}
+//parts taken from past project VC8000, plug github link

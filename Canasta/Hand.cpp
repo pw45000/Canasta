@@ -216,6 +216,21 @@ bool Hand::is_not_duplicate_meld(char rank)
 	return true;
 }
 
+bool Hand::hand_empty()
+{
+	bool hand_is_empty = (meld_container.size() == 0) ? true : false;
+	return hand_is_empty;
+}
+
+bool Hand::has_canasta()
+{
+	for (int itr = 0; itr < meld_container.size(); itr++) {
+		if (is_canasta(itr))
+			return true;
+	}
+	return false;
+}
+
 int Hand::calculate_meld_points(int meld_number)
 {
 	int meld_points = 0;
@@ -232,5 +247,10 @@ void Hand::print_hand()
 	for (Card hand_card : hand_container) {
 		std::cout << hand_card.get_card_string() << std::endl;
 	}
+}
+
+void Hand::add_to_hand(Card card_to_add)
+{
+	hand_container.push_back(card_to_add);
 }
 
