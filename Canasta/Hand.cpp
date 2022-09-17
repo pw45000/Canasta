@@ -179,7 +179,7 @@ bool Hand::is_meldable(Card discard_head)
 		for (int card = 0; card < hand_container.size(); card++) {
 			if (hand_container.at(card).isWild())
 				wild_cards = wild_cards + 1;
-			if (hand_container.at(card).get_card_face() == discard_head.get_card_face())
+			else if (hand_container.at(card).get_card_face() == discard_head.get_card_face())
 				compatible_cards++;
 		}
 		

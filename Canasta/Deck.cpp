@@ -62,7 +62,19 @@ Card Deck::draw_from_stock()
 
 std::vector<Card> Deck::draw_from_discard() {
 	//might switch this to merge with draw depending on the UI of the program. 
-	return discard_pile;
+	std::vector<Card> copy_of_discard = discard_pile;
+	discard_pile.clear();
+
+	Card first_discard;
+
+
+	do {
+		first_discard = draw_from_stock();
+		discard_push_front(first_discard);
+	} while (first_discard.is_red_three() || first_discard.isWild());
+	
+
+	return copy_of_discard;
 }
 
 
@@ -137,7 +149,10 @@ void Deck::set_discard_freeze(bool is_frozen)
 
 void Deck::clear_discard()
 {
-	discard_pile = {};
+	discard_pile.clear();
+
+	//If the card is a red three, draw another card.
+	
 }
 
 

@@ -38,13 +38,12 @@ bool Human::draw(Deck &draw_decks)
 			else {
 				Card top_of_discard = draw_decks.get_top_discard_pile();
 				bool should_discard = hand_for_comparisons.is_meldable(top_of_discard);
+				
 				if (should_discard) {
-					//std::vector<Card> picked_up_discard = draw_decks.draw_from_discard();
-					//add_to_hand(picked_up_discard);
+					std::vector<Card> picked_up_discard = draw_decks.draw_from_discard();
+					add_to_hand(picked_up_discard);
 					purge_red_threes();
 					has_completed_draw = true;
-					//picked_up_discard.clear();
-					draw_decks.clear_discard();
 				}
 				else {
 					std::cout << "No cards in your hand can meld with the top of the discard pile " 

@@ -115,8 +115,6 @@ void Round::output_round_info()
 	
 	std::cout << "   Hand: ";
 	player_1_hand.print_hand();
-	std::cout << std::endl;
-
 	std::cout << "   Melds: ";
 	player_1_hand.print_melds();
 	std::cout << "\n" << std::endl;
@@ -127,8 +125,6 @@ void Round::output_round_info()
 
 	std::cout << "   Hand: ";
 	player_2_hand.print_hand();
-	std::cout << std::endl;
-
 	std::cout << "   Melds: ";
 	player_2_hand.print_melds();
 	std::cout << "\n" << std::endl;
@@ -141,6 +137,8 @@ void Round::output_round_info()
 
 	std::cout << "Next Player: ";
 	(next_player == 1) ? player_1->print_player_type() : player_2->print_player_type();
+	std::cout << std::endl;
+
 }
 
 
