@@ -1,7 +1,11 @@
 #pragma once
+
+
+
 #include "Deck.h"
-#include "Card.h"
 #include "Hand.h"
+
+
 class Player {
 
 public:
@@ -12,9 +16,12 @@ public:
 	void add_to_hand(Card card_to_be_added);
 	void add_to_hand(std::vector<Card> cards_to_be_added);
 	void create_special_meld(Card card_to_be_added);
+	bool create_meld(std::vector<Card> potential_meld);
 	void purge_red_threes();
+	bool lay_off(Card addition, int meld_number);
 	Hand get_player_hand();
 
+	void temp_print_hand();
 
 	virtual void play(Deck& draw_decks) = 0;
 	//virtual void strategy();

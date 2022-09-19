@@ -29,6 +29,9 @@ public:
 	void add_to_hand(Card card_to_add);
 	void add_to_hand(std::vector<Card> card_to_add);
 	void purge_red_threes();
+	int get_size_of_hand();
+	int get_size_of_meld();
+	Card get_card_from_hand(int pos);
 	private:
 	std::vector<std::vector<Card>> meld_container;
 	std::vector<Card> hand_container;

@@ -13,6 +13,8 @@ int Round::coin_toss()
 	std::cout << "2. Tails" << std::endl;
 	do {
 		std::cin >> choice;
+		std::cin.clear();
+		std::cin.ignore(500, '\n');
 		if (choice != "1" && choice != "2")
 			std::cout << "That's not a right option, pick 1 or 2..." << std::endl;
 		
@@ -108,15 +110,13 @@ void Round::output_round_info()
 	auto player_2_hand = player_2->get_player_hand();
 
 	std::cout << "Round: " << round_number << "\n" << std::endl;
-	
-	
+
+
 	player_1->print_player_type();
 	std::cout << "   Score: " << player_1->get_score() << std::endl;
-	
+
 	std::cout << "   Hand: ";
 	player_1_hand.print_hand();
-	std::cout << std::endl;
-
 	std::cout << "   Melds: ";
 	player_1_hand.print_melds();
 	std::cout << "\n" << std::endl;
@@ -127,8 +127,6 @@ void Round::output_round_info()
 
 	std::cout << "   Hand: ";
 	player_2_hand.print_hand();
-	std::cout << std::endl;
-
 	std::cout << "   Melds: ";
 	player_2_hand.print_melds();
 	std::cout << "\n" << std::endl;
@@ -141,6 +139,7 @@ void Round::output_round_info()
 
 	std::cout << "Next Player: ";
 	(next_player == 1) ? player_1->print_player_type() : player_2->print_player_type();
+	std::cout << std::endl;
 }
 
 

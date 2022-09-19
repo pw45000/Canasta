@@ -30,13 +30,16 @@ public:
 	bool isSpecial() const; 
 	bool isNatural() const;
 	bool is_red_three() const;
+	bool get_has_transferred() const;
+
+	void set_has_transferred(bool has_transferred);
 
 private:  
 	char face;
 	char suit;
 	std::string string_representation;
 	int point_value;
-
+	bool has_transferred;
 };
 
 //one of the only functions not added within the class. This is because we need a binary comparison.

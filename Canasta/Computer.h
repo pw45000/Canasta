@@ -1,5 +1,7 @@
 #pragma once
+class Player;
 #include "Player.h"
+
 class Computer : public Player {
 public: 
 	void play(Deck& draw_decks) ;

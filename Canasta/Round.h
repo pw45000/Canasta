@@ -1,9 +1,20 @@
 #pragma once
+
+class Player;
+class Computer; 
+class Human;
+class Deck;
+class Card; 
+class Hand;
+class Game;
+
 #include "Game.h"
-#include "Deck.h"
-#include "Player.h"
-#include "Computer.h"
-#include "Human.h"
+
+
+
+
+
+
 class Round {
 public: 
 	Round();

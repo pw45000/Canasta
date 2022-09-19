@@ -128,6 +128,8 @@ int validate_option_based_input(int lower_bound, int upper_bound)
 	do {
 		
 		std::cin >> input;
+		std::cin.clear();
+		std::cin.ignore(10000000, '\n');
 		
 		if (std::all_of(input.begin(), input.end(), ::isdigit)) {
 			converted_option = std::stoi(input);

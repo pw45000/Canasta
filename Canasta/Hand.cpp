@@ -39,10 +39,13 @@ bool Hand::lay_off(Card addition, int meld_number)
 	std::vector <Card> existing_meld = meld_container.at(meld_number);
 	//if the card is wild, ignore meld checking.
 
-	if (existing_meld.at(0).isSpecial())
+	if (existing_meld.at(0).isSpecial()) {
+		std::cout << "Lay off error: You cannot add onto a red three's meld!" << std::endl;
 		return false;
+	}
 	
 	if (addition.isSpecial()) {
+		std::cout << "Lay off error: You cannot add a special card to a meld!" << std::endl;
 		return false;
 	}
 	
@@ -53,13 +56,14 @@ bool Hand::lay_off(Card addition, int meld_number)
 		for (int itr = 0; itr < existing_meld.size(); itr++)
 			if (existing_meld.at(itr).isWild())
 				wild_counter++;
-		//However, do check how many wild hards there are. 
+		//However, do check how many wild cards there are. 
 		if (wild_counter < 3) { 
 			meld_container.at(meld_number).push_back(addition);
 			remove_from_hand(addition);
 			return true;
 		}
 		else {
+			std::cout << "Lay off error: either the meld has too many wild cards! At most there can be 3 in a meld!" << std::endl;
 			return false;
 		}
 	}
@@ -73,6 +77,7 @@ bool Hand::lay_off(Card addition, int meld_number)
 			return true;
 		}
 		else {
+			std::cout << "Lay off error: the card faces do not match the meld!" << std::endl;
 			return false;
 		}
 	}
@@ -89,6 +94,7 @@ bool Hand::create_meld(Card first, Card second, Card third)
 	char card_rank;
 	
 	if (first.isSpecial() || second.isSpecial() || third.isSpecial()) {
+		std::cout << "Meld error: you can't make a meld out of special cards!" << std::endl;
 		return false;
 	}
 
@@ -106,6 +112,7 @@ bool Hand::create_meld(Card first, Card second, Card third)
 		}
 
 		else {
+			std::cout << "Meld error: Meld of " << first.get_card_face() << "already exists!" << std::endl;
 			return false;
 		}
 		
@@ -115,28 +122,59 @@ bool Hand::create_meld(Card first, Card second, Card third)
 	else {
 		//both variables are declared outside of the loop
 		//so as to show they are needed to be used elsewhere as well.
-		int card_pos; 
+		int card_pos = 0;
 		Card wild_Card;
+		int wild_counter = 0;
+		int wild_pos = 0;
 		//search the potential meld for a wild card.
 		for (card_pos = 0; card_pos < 3; card_pos++) {
 			if (potential_meld.at(card_pos).isWild()) {
 				wild_Card = potential_meld.at(card_pos);
+				wild_pos = card_pos;
+				wild_counter++;
 				//rather than search through the vector again, we can just remove
 				//the wild card.
-				potential_meld.erase(potential_meld.begin() + card_pos);
+
 			}
 		}
-		//if the wild card is not removed, then break since it's not a valid meld.
-		if (potential_meld.size() == 3)
+
+		//need a counter to prevent vector errors.
+		if (wild_counter <= 1)
+			potential_meld.erase(potential_meld.begin() + wild_pos);
+
+
+		//if the wild card is not removed, then break since it's not a valid meld due to lack
+		//of equivalence of the faces
+		if (potential_meld.size() == 3) {
+			std::cout << "Meld error: one or more faces are different from another! Melds need to be of the same rank or have a wildcard!"
+			<< std::endl;
 			return false;
+		}
 		//If the two remaining cards are of the same rank, it's a valid meld.
 		else if (potential_meld.at(0).get_card_face() == potential_meld.at(1).get_card_face()) {
-			potential_meld.push_back(wild_Card);
-			meld_container.push_back(potential_meld);
-			return true;
+			if (is_not_duplicate_meld(potential_meld.at(0).get_card_face())) {
+				potential_meld.push_back(wild_Card);
+				meld_container.push_back(potential_meld);
+				for (int itr = 0; itr < 3; itr++) {
+					remove_from_hand(potential_meld.at(itr));
+				}
+
+
+				return true;
+			}
+
+			else {
+				std::cout << "Meld error: Meld of " << first.get_card_face() << "already exists!" << std::endl;
+				return false;
+			
+			}
+			
+			
 		}
 		//otherwise, return since it's not a valid meld.
 		else {
+			std::cout << "Meld error: one or more faces are different from another! Melds need to be of the same rank or have a wildcard!"
+			<< std::endl;
 			return false;
 		}
 	}
@@ -148,6 +186,7 @@ bool Hand::create_meld(Card red_three)
 		std::vector<Card> special_meld;
 		special_meld.push_back(red_three);
 		meld_container.push_back(special_meld);
+		remove_from_hand(red_three);
 		return true;
 	}
 	else {
@@ -293,4 +332,21 @@ void Hand::purge_red_threes()
 		}
 	}
 }
+
+int Hand::get_size_of_hand()
+{
+	return hand_container.size();
+}
+
+int Hand::get_size_of_meld()
+{
+	return meld_container.size();
+}
+
+Card Hand::get_card_from_hand(int pos)
+{
+	return hand_container.at(pos);
+}
+
+
 

@@ -1,8 +1,10 @@
 #include "Human.h"
+#include <iostream>
 
 void Human::play(Deck& draw_decks)
 {
 	draw(draw_decks);
+	meld();
 }
 
 bool Human::draw(Deck &draw_decks)
@@ -39,12 +41,10 @@ bool Human::draw(Deck &draw_decks)
 				Card top_of_discard = draw_decks.get_top_discard_pile();
 				bool should_discard = hand_for_comparisons.is_meldable(top_of_discard);
 				if (should_discard) {
-					//std::vector<Card> picked_up_discard = draw_decks.draw_from_discard();
-					//add_to_hand(picked_up_discard);
+					std::vector<Card> picked_up_discard = draw_decks.draw_from_discard();
+					add_to_hand(picked_up_discard);
 					purge_red_threes();
 					has_completed_draw = true;
-					//picked_up_discard.clear();
-					draw_decks.clear_discard();
 				}
 				else {
 					std::cout << "No cards in your hand can meld with the top of the discard pile " 
@@ -66,7 +66,117 @@ bool Human::draw(Deck &draw_decks)
 
 void Human::meld()
 {
-	return;
+	int option = 0;
+	bool operation_success = false;
+	bool still_melding = true;
+	int choice;
+
+	do {
+		std::cout << "MELD PHASE: Pick an option." << std::endl;
+		std::cout << "1. Create a Meld" << std::endl;
+		std::cout << "2. Add to a pre-existing Meld " << std::endl;
+		std::cout << "3. Transfer wildcards from one meld to another" << std::endl;
+		std::cout << "4. End Meld Phase" << std::endl;
+		option = validate_option_based_input(1, 4);
+
+		switch (option) {
+		case 1: {
+			temp_print_hand();
+			operation_success = false;
+			std::vector<Card> potentenial_meld = validate_comma_input();
+			if (potentenial_meld.size() == 0)
+				break;
+			else {
+				operation_success = create_meld(potentenial_meld);
+				temp_print_hand();
+			}
+			if (!operation_success)
+				std::cout << "The meld operation was unsuccessful! Please see the above output^" << std::endl;
+			break;
+		}
+		case 2: {
+			do {
+				temp_print_hand();
+				operation_success = false;
+				int card_pos = 0;
+				int meld_pos = 0;
+				Card card_to_lay_off;
+				Hand player_hand = get_player_hand();
+
+				if (player_hand.get_size_of_meld() != 0) {
+
+					std::cout << "ADD TO EXISTING MELD: Pick a card position from 1 to " << player_hand.get_size_of_hand()
+						<< " to add to a pre-existing meld. Say 0 to cancel the operation" << std::endl;
+					card_pos = validate_option_based_input(0, player_hand.get_size_of_hand()) - 1;
+
+					//this is if the user enters 0.
+					if (card_pos == -1) break;
+
+					card_to_lay_off = player_hand.get_card_from_hand(card_pos);
+
+					std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
+						<< " to add onto. Enter 0 cancel the operation." << std::endl;
+					meld_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
+
+					//this is if the user enters 0.
+					if (meld_pos == -1) break;
+
+					operation_success = lay_off(card_to_lay_off, meld_pos);
+					if (!operation_success) {
+						std::cout << "The lay off operation was unsuccessful! Please see the above output^" << std::endl;
+					}
+				}
+				else {
+					std::cout << "Meld Error: you have no melds to add onto!" << std::endl;
+				}
+			} while (operation_success != true);
+			temp_print_hand();
+			break;
+
+		case 3:
+			temp_print_hand();
+			operation_success = false;
+			int wild_pos = 0;
+			int meld_pos = 0;
+			Card card_to_lay_off;
+			Hand player_hand = get_player_hand();
+
+			if (player_hand.get_size_of_meld() != 0) {
+
+				std::cout << "TRANSFER WILD CARDS: Pick a card position from 1 to " << player_hand.get_size_of_meld()
+					<< " to extract the wild card's position. Say 0 to cancel the operation" << std::endl;
+				wild_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
+
+				//this is if the user enters 0.
+				if (meld_pos == -1) break;
+
+				card_to_lay_off = player_hand.get_card_from_hand(meld_pos);
+
+				std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
+					<< " to add onto. Enter 0 cancel the operation." << std::endl;
+				meld_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
+
+				//this is if the user enters 0.
+				if (meld_pos == -1) break;
+
+				operation_success = lay_off(card_to_lay_off, meld_pos);
+				if (!operation_success) {
+					std::cout << "The lay off operation was unsuccessful! Please see the above output^" << std::endl;
+				}
+			}
+			else {
+				std::cout << "Meld Error: you have no melds to add onto!" << std::endl;
+			}
+		} while (operation_success != true);
+
+		break;
+		case 4:
+			still_melding = false;
+			break;
+		}
+	} while (still_melding);
+
+
 }
 
 void Human::discard()
@@ -77,5 +187,80 @@ void Human::discard()
 void Human::print_player_type()
 {
 	std::cout << "Human:" << std::endl;
+}
+
+
+std::vector<Card> Human::validate_comma_input()
+{
+	bool has_valid_input = false;
+	std::string input;
+	Hand player_hand = get_player_hand();
+	//we need parenthesis due to order of operations.
+	int card_pos_range = player_hand.get_size_of_hand();
+	std::vector<Card> cards_to_meld;
+	do {
+		std::cout << "CREATE MELD: Please input the position of the cards you want to meld. Please put EXACTLY 3 unique positions." << std::endl;
+		std::cout << "Card position starts at 1 and ends at " << card_pos_range << std::endl;
+		std::cout << "That or say quit to cancel this phase." << std::endl;
+
+
+		getline(std::cin, input);
+
+
+		if (input == "quit" || input == "Quit" || input == "QUIT")
+			break;
+
+		std::vector<std::string> results;
+
+		//strips the string of all whitespace.
+		input.erase(std::remove_if(input.begin(), input.end(), ::isspace), input.end());
+		std::stringstream  ss(input);
+		std::string str;
+
+
+		while (getline(ss, str, ',')) {
+			results.push_back(str);	
+		}
+		if (results.size() != 3) {
+			std::cout << "You either too many or too little positions. Please put only 3 positions" << std::endl;
+		}
+
+		results.erase(std::unique(results.begin(), results.end()),results.end());
+
+		if (results.size() != 3) {
+			std::cout << "No duplicates can exist! Please enter unique positions." << std::endl;
+		}
+
+		for (int input_pos = 0; input_pos < results.size(); input_pos++) {
+			std::string potential_card_pos = results.at(input_pos);
+			//checks if all the positions are alphanumeric.
+			if (!(std::all_of(potential_card_pos.begin(), potential_card_pos.end(), ::isdigit))) {
+				std::cout<<"Position is not numeric. Please input a numeric position!"<<std::endl;
+			}
+
+
+			else {
+				//converts from string to int and then ensures it's within the card range.
+				//note that it's not at index 0, since we don't know if the user is technically apt.
+				int pos_to_compare = stoi(potential_card_pos);
+				if (pos_to_compare >= 1 && pos_to_compare <= card_pos_range) {
+					cards_to_meld.push_back(player_hand.get_card_from_hand(pos_to_compare-1));
+				}
+				else {
+					std::cout << "Position is not within range 1 to " << card_pos_range << "!" << std::endl;
+					break;
+				}
+			}
+			ss.str("");
+		}
+
+		if (cards_to_meld.size() == 3)
+			has_valid_input = true;
+		else
+			cards_to_meld.clear();
+
+
+	} while (has_valid_input == false);
+	return cards_to_meld;
 }
 

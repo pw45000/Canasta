@@ -22,6 +22,7 @@ Card::Card() : face(0), suit(0), point_value(0) {
 	//strings cannot be constructor initialized, 
 	//so they need to be set manually.
 	this->string_representation = "NULL";
+	this->has_transferred = false;
 };
 
 
@@ -66,6 +67,7 @@ Card::Card(char face, char suit, std::string string_reprensentation, int point_v
 	//strings cannot be constructor initialized, 
 	//so they need to be set manually.
 	this->string_representation = string_reprensentation;
+	this->has_transferred = false;
 }
 Card::Card(const Card& other_card)
 {
@@ -323,6 +325,16 @@ bool Card::is_red_three() const
 		return true;
 	else
 		return false;
+}
+
+bool Card::get_has_transferred() const
+{
+	return has_transferred;
+}
+
+void Card::set_has_transferred(bool has_transferred)
+{
+	this->has_transferred = has_transferred;
 }
 
 bool operator==(const Card card1, const Card card2)

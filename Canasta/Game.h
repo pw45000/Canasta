@@ -1,8 +1,16 @@
 #pragma once
+
+class Card;
+class Deck;
+class Hand;
+class Player;
+class Computer;
+class Round;
+class Human;
+
+
 #include <iostream>
 #include <vector>
-#include "Card.h"
-#include "Deck.h"
 #include "Hand.h"
 #include "Player.h"
 #include "Computer.h"
@@ -11,6 +19,9 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <vector>
+#include <string>
+
 
 class Game {
 public: 
