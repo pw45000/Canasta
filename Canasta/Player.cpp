@@ -68,17 +68,25 @@ Hand Player::get_player_hand()
 
 void Player::temp_print_hand()
 {
+	std::cout << std::endl;
 	std::cout << "Hand: "; get_player_hand().print_hand();
 	std::cout << "      ";
 	for (int i = 0; i < get_player_hand().get_size_of_hand(); i++) {
 		std::cout << (i+1);
 		if (i+1 <= 9)
 			std::cout << "  ";
-		else
+		else if (i+1 <=99)
 			std::cout << " ";
 	}
 	std::cout << std::endl;
 	std::cout << "Melds: ";  get_player_hand().print_melds();
+	std::cout << std::endl;
+
+}
+
+bool Player::transfer_card(Card wild_card, int wild_origin, int meld_number)
+{
+	return player_hand.transfer_wild_card(wild_card, wild_origin, meld_number);
 }
 
 void Player::play(Deck& draw_decks)

@@ -32,6 +32,11 @@ public:
 	int get_size_of_hand();
 	int get_size_of_meld();
 	Card get_card_from_hand(int pos);
+	void print_all_wilds_of_meld(int meld);
+	int count_all_wilds_of_meld(int meld);
+	Card get_card_from_meld(int meld_pos, int card_pos);
+
+
 	private:
 	std::vector<std::vector<Card>> meld_container;
 	std::vector<Card> hand_container;

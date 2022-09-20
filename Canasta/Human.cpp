@@ -128,48 +128,66 @@ void Human::meld()
 				}
 				else {
 					std::cout << "Meld Error: you have no melds to add onto!" << std::endl;
+					break;
 				}
 			} while (operation_success != true);
 			temp_print_hand();
 			break;
-
+		}
 		case 3:
+		{
 			temp_print_hand();
 			operation_success = false;
 			int wild_pos = 0;
+			int wild_card_pos;
 			int meld_pos = 0;
-			Card card_to_lay_off;
+			Card card_to_transfer;
 			Hand player_hand = get_player_hand();
+			do {
+				if (player_hand.get_size_of_meld() != 0) {
 
-			if (player_hand.get_size_of_meld() != 0) {
+					std::cout << "TRANSFER WILD CARDS: Pick a meld from 1 to " << player_hand.get_size_of_meld()
+						<< " to extract the wild card's position. Say 0 to cancel the operation" << std::endl;
+					wild_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
 
-				std::cout << "TRANSFER WILD CARDS: Pick a card position from 1 to " << player_hand.get_size_of_meld()
-					<< " to extract the wild card's position. Say 0 to cancel the operation" << std::endl;
-				wild_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
+					//this is if the user enters 0.
+					if (meld_pos == -1) break;
 
-				//this is if the user enters 0.
-				if (meld_pos == -1) break;
+					if (player_hand.count_all_wilds_of_meld(wild_pos) == 0) {
+						std::cout << "The meld you chose has no wild cards!" << std::endl;
+						break;
+					}
 
-				card_to_lay_off = player_hand.get_card_from_hand(meld_pos);
+					else {
+						std::cout << "Great, now pick a card from the following list to transfer Say 0 to cancel" << std::endl;
+						//card_to_transfer = player_hand.get_card_from_hand(meld_pos);
+						player_hand.print_all_wilds_of_meld(wild_pos);
+						wild_card_pos = validate_option_based_input(0, player_hand.count_all_wilds_of_meld(wild_pos)) - 1;
+						if (wild_card_pos == -1)
+							break;
+						card_to_transfer = player_hand.get_card_from_meld(wild_pos, wild_card_pos);
+					}
 
-				std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
-					<< " to add onto. Enter 0 cancel the operation." << std::endl;
-				meld_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
+					std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
+						<< " to add onto. Enter 0 cancel the operation." << std::endl;
+					meld_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
 
-				//this is if the user enters 0.
-				if (meld_pos == -1) break;
+					//this is if the user enters 0.
+					if (meld_pos == -1) break;
 
-				operation_success = lay_off(card_to_lay_off, meld_pos);
-				if (!operation_success) {
-					std::cout << "The lay off operation was unsuccessful! Please see the above output^" << std::endl;
+					operation_success = transfer_card(card_to_transfer, wild_pos, meld_pos);
+					if (!operation_success) {
+						std::cout << "The  was unsuccessful! Please see the above output^" << std::endl;
+					}
 				}
-			}
-			else {
-				std::cout << "Meld Error: you have no melds to add onto!" << std::endl;
-			}
-		} while (operation_success != true);
+				else {
+					std::cout << "Meld Error: you have no melds to add onto!" << std::endl;
+					break;
+				}
+			} while (operation_success != true);
 
-		break;
+			break;
+		}
 		case 4:
 			still_melding = false;
 			break;

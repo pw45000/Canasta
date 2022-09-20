@@ -22,6 +22,8 @@ public:
 	Hand get_player_hand();
 
 	void temp_print_hand();
+	bool transfer_card(Card wild_card, int wild_origin, int meld_number);
+
 
 	virtual void play(Deck& draw_decks) = 0;
 	//virtual void strategy();

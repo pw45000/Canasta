@@ -348,5 +348,33 @@ Card Hand::get_card_from_hand(int pos)
 	return hand_container.at(pos);
 }
 
+void Hand::print_all_wilds_of_meld(int meld_pos)
+{
+	std::vector<Card> wild_meld = meld_container.at(meld_pos);
+
+	int wild_counter = 0;
+
+	for (int itr = 0; itr < wild_meld.size(); itr++)
+		if (wild_meld.at(itr).isWild()) {
+			wild_counter++;
+			std::cout << wild_counter << ". " << wild_meld.at(itr).get_card_string() << std::endl;
+		}
+}
+
+int Hand::count_all_wilds_of_meld(int meld_pos)
+{
+	std::vector<Card> wild_meld = meld_container.at(meld_pos);
+	int amount_of_wild_cards = 0;
+	for (int itr = 0; itr < wild_meld.size(); itr++)
+		if (wild_meld.at(itr).isWild())
+			amount_of_wild_cards++;
+	return amount_of_wild_cards;
+}
+
+Card Hand::get_card_from_meld(int meld_pos, int card_pos)
+{
+	return meld_container.at(meld_pos).at(card_pos);
+}
+
 
 
