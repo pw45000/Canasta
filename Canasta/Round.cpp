@@ -60,6 +60,7 @@ void Round::main_round()
 			if (menu_choice == 4) break;
 			output_round_info();
 			player1->play(stock_and_discard);
+			player1->clear_transfer_states();
 			//we'll need to increment next player to pass the turn.
 			next_player++;
 		}
@@ -70,10 +71,12 @@ void Round::main_round()
 			if (menu_choice == 4) break;
 			output_round_info();
 			player2->play(stock_and_discard);
+			player2->clear_transfer_states();
 			//since 2 is bigger than 1, we'll need to decrement 
 			//to get the next player to be 1.
 			next_player--;
 		}
+		output_round_info();
 	} while (round_is_over == false && menu_choice != 4);
 
 

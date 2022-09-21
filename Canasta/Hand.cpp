@@ -21,7 +21,7 @@ bool Hand::transfer_wild_card(Card transfer, int wild_origin, int meld_target) {
 			return false;
 		}
 
-		if (transfer.get_has_transferred() == false) {
+		if (transfer.get_has_transferred() == true) {
 			std::cout << "The current card has been transfered once! Please only transfer wild cards once per turn." << std::endl;
 			return false;
 		}
@@ -372,7 +372,7 @@ void Hand::print_all_wilds_of_meld(int meld_pos)
 	int wild_counter = 0;
 
 	for (int itr = 0; itr < wild_meld.size(); itr++)
-		if (wild_meld.at(itr).isWild()) {
+		if (wild_meld.at(itr).isWild() && wild_meld.at(itr).get_has_transferred()==false) {
 			wild_counter++;
 			std::cout << wild_counter << ". " << wild_meld.at(itr).get_card_string() << std::endl;
 		}
@@ -396,9 +396,9 @@ Card Hand::get_card_from_meld(int meld_pos, int card_pos)
 void Hand::clear_transfer_states()
 {
 	for (int meld = 0; meld < meld_container.size(); meld++) {
-		std::vector<Card> meld_to_change;
+		std::vector<Card> meld_to_change = meld_container.at(meld);
 		for (int card = 0; card < meld_to_change.size(); card++)
-			meld_to_change.at(card).set_has_transferred(false);
+			meld_container.at(meld).at(card).set_has_transferred(false);
 	}
 }
 
