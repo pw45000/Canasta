@@ -13,25 +13,40 @@ Hand::Hand(std::vector<Card> debug_hand)
 bool Hand::transfer_wild_card(Card transfer, int wild_origin, int meld_target) {
 	std::vector<Card> wild_origin_vector = meld_container.at(wild_origin);
 	
-	if (transfer.isWild()) {
-		if (meld_container.at(wild_origin).size() == 3)
+
+	
+	if (transfer.isWild() ) {
+		if (meld_container.at(wild_origin).size() <= 3) {
+			std::cout << "The selected meld to trasnfer from is too small! Please transfer with a meld with a size >=3..." << std::endl;
 			return false;
+		}
+
+		if (transfer.get_has_transferred() == false) {
+			std::cout << "The current card has been transfered once! Please only transfer wild cards once per turn." << std::endl;
+			return false;
+		}
+
+
 		//checks if wild_card exists within it's designated meld.
 		auto wild_itr = std::find(meld_container.at(wild_origin).begin(), meld_container.at(wild_origin).end(), transfer);
 		//if the wild card is found and the meld isn't the minimum of a meld, transfer the wild card over.
-		if (wild_itr != meld_container.at(wild_origin).end() && meld_container.at(meld_target).size()>=3) {
+		if (wild_itr != meld_container.at(wild_origin).end() && meld_container.at(meld_target).size() <= 3) {
 			meld_container.at(wild_origin).erase(wild_itr);
+			transfer.set_has_transferred(true);
 			meld_container.at(meld_target).push_back(transfer);
-			
+
 			return true;
 		}
 		else
-			return false;
+			std::cout << "Transfer wild card error: cannot transfer wildcard of meld size 3 or less, or wild card not found..."
+			<< std::endl;
+		return false;
 
 	}
-	else
+	else {
+		std::cout << "The selected card is not a wild card!" << std::endl;
 		return false;
-	
+	}
 }
 
 bool Hand::lay_off(Card addition, int meld_number)
@@ -58,6 +73,7 @@ bool Hand::lay_off(Card addition, int meld_number)
 				wild_counter++;
 		//However, do check how many wild cards there are. 
 		if (wild_counter < 3) { 
+			addition.set_has_transferred(true);
 			meld_container.at(meld_number).push_back(addition);
 			remove_from_hand(addition);
 			return true;
@@ -153,6 +169,7 @@ bool Hand::create_meld(Card first, Card second, Card third)
 		//If the two remaining cards are of the same rank, it's a valid meld.
 		else if (potential_meld.at(0).get_card_face() == potential_meld.at(1).get_card_face()) {
 			if (is_not_duplicate_meld(potential_meld.at(0).get_card_face())) {
+				wild_Card.set_has_transferred(true);
 				potential_meld.push_back(wild_Card);
 				meld_container.push_back(potential_meld);
 				for (int itr = 0; itr < 3; itr++) {
@@ -361,19 +378,39 @@ void Hand::print_all_wilds_of_meld(int meld_pos)
 		}
 }
 
-int Hand::count_all_wilds_of_meld(int meld_pos)
+std::vector<Card> Hand::get_wild_cards(int meld_pos)
 {
-	std::vector<Card> wild_meld = meld_container.at(meld_pos);
-	int amount_of_wild_cards = 0;
-	for (int itr = 0; itr < wild_meld.size(); itr++)
-		if (wild_meld.at(itr).isWild())
-			amount_of_wild_cards++;
-	return amount_of_wild_cards;
+	std::vector<Card> extraction_meld = meld_container.at(meld_pos);
+	std::vector<Card> wild_meld;
+	for (int itr = 0; itr < extraction_meld.size(); itr++)
+		if (extraction_meld.at(itr).isWild() && !(extraction_meld.at(itr).get_has_transferred()))
+			wild_meld.push_back(extraction_meld.at(itr));
+	return wild_meld;
 }
 
 Card Hand::get_card_from_meld(int meld_pos, int card_pos)
 {
 	return meld_container.at(meld_pos).at(card_pos);
+}
+
+void Hand::clear_transfer_states()
+{
+	for (int meld = 0; meld < meld_container.size(); meld++) {
+		std::vector<Card> meld_to_change;
+		for (int card = 0; card < meld_to_change.size(); card++)
+			meld_to_change.at(card).set_has_transferred(false);
+	}
+}
+
+void Hand::clear_all_data()
+{
+	hand_container.clear();
+	meld_container.clear();
+}
+
+void Hand::sort()
+{
+	std::sort(hand_container.begin(), hand_container.end());
 }
 
 

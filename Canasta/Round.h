@@ -29,6 +29,8 @@ public:
 	int get_next_player() const;
 	void set_next_player(int next_player);
 	void output_round_info();
+	void sort_players_hands();
+	int pre_turn_menu();
 
 private: 
 	Deck stock_and_discard;
@@ -38,3 +40,4 @@ private:
 	int next_player;
 	std::vector<Player*> players;
 };
+

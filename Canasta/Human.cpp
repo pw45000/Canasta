@@ -5,6 +5,7 @@ void Human::play(Deck& draw_decks)
 {
 	draw(draw_decks);
 	meld();
+	discard(draw_decks);
 }
 
 bool Human::draw(Deck &draw_decks)
@@ -14,6 +15,7 @@ bool Human::draw(Deck &draw_decks)
 	std::cout << "2. Discard " << std::endl;
 
 	bool has_completed_draw = false;
+	bool stock_is_empty;
 	Hand hand_for_comparisons = get_player_hand();
 	Card drawn_card;
 
@@ -52,10 +54,12 @@ bool Human::draw(Deck &draw_decks)
 				}
 			}
 		}
-	} while (!(draw_decks.both_piles_are_empty()) && !(has_completed_draw));
+	} while (!(draw_decks.both_piles_are_empty()) && !(has_completed_draw) ||
+		(!draw_decks.stock_is_empty() && !draw_decks.get_discard_is_frozen() && !(has_completed_draw))
+		);
 
 
-	if (!(draw_decks.both_piles_are_empty())) {
+	if (!(draw_decks.both_piles_are_empty()) && !(!draw_decks.stock_is_empty() && !draw_decks.get_discard_is_frozen())) {
 		return true;
 	}
 	else {
@@ -69,7 +73,7 @@ void Human::meld()
 	int option = 0;
 	bool operation_success = false;
 	bool still_melding = true;
-	int choice;
+	int choice = 0;
 
 	do {
 		std::cout << "MELD PHASE: Pick an option." << std::endl;
@@ -153,8 +157,11 @@ void Human::meld()
 					//this is if the user enters 0.
 					if (meld_pos == -1) break;
 
-					if (player_hand.count_all_wilds_of_meld(wild_pos) == 0) {
-						std::cout << "The meld you chose has no wild cards!" << std::endl;
+
+					std::vector<Card> wild_meld = player_hand.get_wild_cards(wild_pos);
+
+					if (wild_meld.size() == 0) {
+						std::cout << "The meld you chose has no wild cards that can be transfered!" << std::endl;
 						break;
 					}
 
@@ -162,10 +169,11 @@ void Human::meld()
 						std::cout << "Great, now pick a card from the following list to transfer Say 0 to cancel" << std::endl;
 						//card_to_transfer = player_hand.get_card_from_hand(meld_pos);
 						player_hand.print_all_wilds_of_meld(wild_pos);
-						wild_card_pos = validate_option_based_input(0, player_hand.count_all_wilds_of_meld(wild_pos)) - 1;
+						wild_card_pos = validate_option_based_input(0, wild_meld.size())-1;
 						if (wild_card_pos == -1)
 							break;
-						card_to_transfer = player_hand.get_card_from_meld(wild_pos, wild_card_pos);
+						//extracts the specific card we want from the list of wildcards.
+						card_to_transfer = wild_meld.at(wild_card_pos);
 					}
 
 					std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
@@ -174,6 +182,11 @@ void Human::meld()
 
 					//this is if the user enters 0.
 					if (meld_pos == -1) break;
+					if (meld_pos == wild_pos) {
+						std::cout << "You don't need to transfer a wild card to the same meld..." << std::endl;
+						break;
+					}
+
 
 					operation_success = transfer_card(card_to_transfer, wild_pos, meld_pos);
 					if (!operation_success) {
@@ -197,9 +210,28 @@ void Human::meld()
 
 }
 
-void Human::discard()
+void Human::discard(Deck& draw_decks)
 {
-	return;
+	temp_print_hand();
+	Hand player_hand = get_player_hand();
+	int size_of_hand = player_hand.get_size_of_hand();
+	std::cout << "DISCARD Phase: What card would you like to discard? Select a position from 1 to " 
+		<< size_of_hand << std::endl;
+	int choice = validate_option_based_input(0, size_of_hand) - 1;
+
+	Card card_to_discard = player_hand.get_card_from_hand(choice);
+	if (card_to_discard.isWild() || card_to_discard.isSpecial()) {
+		draw_decks.discard_push_front(card_to_discard);
+		player_hand.remove_from_hand(card_to_discard);
+		draw_decks.set_discard_freeze(true);
+	}
+	else {
+		draw_decks.discard_push_front(card_to_discard);
+		player_hand.remove_from_hand(card_to_discard);
+		draw_decks.set_discard_freeze(false);
+	}
+
+	
 }
 
 void Human::print_player_type()

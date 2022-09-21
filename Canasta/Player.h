@@ -20,16 +20,18 @@ public:
 	void purge_red_threes();
 	bool lay_off(Card addition, int meld_number);
 	Hand get_player_hand();
-
+	void sort_hand();
 	void temp_print_hand();
 	bool transfer_card(Card wild_card, int wild_origin, int meld_number);
-
+	void clear_transfer_states();
+	bool remove_from_hand(Card discard_card);
+	void clear_hand();
 
 	virtual void play(Deck& draw_decks) = 0;
 	//virtual void strategy();
 	virtual bool draw(Deck &draw_decks) = 0;
 	virtual void meld();
-	virtual void discard();
+	virtual void discard(Deck& draw_decks) = 0;
 	virtual void print_player_type() = 0;
 private:
 	int score;

@@ -5,7 +5,7 @@ void Computer::play(Deck& draw_decks)
 	std::cout << "TODO" << std::endl;
 }
 
-void Computer::discard()
+void Computer::discard(Deck& draw_decks)
 {
 	std::cout << "TODO" << std::endl;
 }

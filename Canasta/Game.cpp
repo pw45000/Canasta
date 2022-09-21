@@ -100,10 +100,12 @@ void Game::main_game()
 		round_number++;
 		Round game_round(players, round_number);
 		game_round.main_round();
-		std::cout << "Would you like to play again?" << std::endl;
+		std::cout << "Would you like to another round?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
+		players.at(0)->clear_hand();
+		players.at(1)->clear_hand();
 	} while (choice != 2);
 	players.clear();
 }

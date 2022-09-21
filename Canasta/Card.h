@@ -32,6 +32,9 @@ public:
 	bool is_red_three() const;
 	bool get_has_transferred() const;
 
+
+	int get_numeric_value() const;
+
 	void set_has_transferred(bool has_transferred);
 
 private:  
@@ -44,3 +47,4 @@ private:
 
 //one of the only functions not added within the class. This is because we need a binary comparison.
 bool operator== (const Card card1, const Card card2);
+bool operator< (const Card card1, const Card card2);

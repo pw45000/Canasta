@@ -42,7 +42,8 @@ void Round::main_round()
 {
 	auto player1 = players.at(0);
 	auto player2 = players.at(1);
-
+	int menu_choice = 0;
+	bool round_is_over = false;
 
 	if (player1->get_score() == player2->get_score()) {
 		//the coin toss decides which player is going next.
@@ -51,20 +52,31 @@ void Round::main_round()
 	}
 
 	initial_draw();
-	output_round_info();
+	sort_players_hands();
 	
-	if (next_player == 1) {
-		player1->play(stock_and_discard);
-		//we'll need to increment next player to pass the turn.
-		next_player++;
-	}
+	do {
+		if (next_player == 1) {
+			menu_choice = pre_turn_menu();
+			if (menu_choice == 4) break;
+			output_round_info();
+			player1->play(stock_and_discard);
+			//we'll need to increment next player to pass the turn.
+			next_player++;
+		}
 
-	else {
-		player2->play(stock_and_discard);
-		//since 2 is bigger than 1, we'll need to decrement 
-		//to get the next player to be 1.
-		next_player--;
-	}
+
+		else {
+			menu_choice = pre_turn_menu();
+			if (menu_choice == 4) break;
+			output_round_info();
+			player2->play(stock_and_discard);
+			//since 2 is bigger than 1, we'll need to decrement 
+			//to get the next player to be 1.
+			next_player--;
+		}
+	} while (round_is_over == false && menu_choice != 4);
+
+
 
 	output_round_info();
 	
@@ -140,6 +152,21 @@ void Round::output_round_info()
 	std::cout << "Next Player: ";
 	(next_player == 1) ? player_1->print_player_type() : player_2->print_player_type();
 	std::cout << std::endl;
+}
+
+void Round::sort_players_hands()
+{
+	for (int itr = 0; itr < players.size(); itr++)
+		players.at(itr)->sort_hand();
+}
+
+int Round::pre_turn_menu()
+{
+	std::cout << "1. Save the game" << std::endl;
+	std::cout << "2. Take the turn" << std::endl;
+	std::cout << "3. Advice (ask for help)" << std::endl;
+	std::cout << "4. Quit the game" << std::endl;
+	return validate_option_based_input(1, 4);
 }
 
 

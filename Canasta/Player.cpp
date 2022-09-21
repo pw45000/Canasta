@@ -66,6 +66,11 @@ Hand Player::get_player_hand()
 	return player_hand;
 }
 
+void Player::sort_hand()
+{
+	player_hand.sort();
+}
+
 void Player::temp_print_hand()
 {
 	std::cout << std::endl;
@@ -89,6 +94,21 @@ bool Player::transfer_card(Card wild_card, int wild_origin, int meld_number)
 	return player_hand.transfer_wild_card(wild_card, wild_origin, meld_number);
 }
 
+void Player::clear_transfer_states()
+{
+	player_hand.clear_transfer_states();
+}
+
+bool Player::remove_from_hand(Card discard_card)
+{
+	return player_hand.remove_from_hand(discard_card);
+}
+
+void Player::clear_hand()
+{
+	player_hand.clear_all_data();
+}
+
 void Player::play(Deck& draw_decks)
 {
 	std::cout << "TODO" << std::endl;
@@ -104,7 +124,7 @@ void Player::meld()
 	std::cout << "TODO" << std::endl;
 }
 
-void Player::discard()
+void Player::discard(Deck& draw_decks)
 {
 	std::cout << "TODO" << std::endl;
 }

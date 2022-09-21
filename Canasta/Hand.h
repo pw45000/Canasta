@@ -33,8 +33,13 @@ public:
 	int get_size_of_meld();
 	Card get_card_from_hand(int pos);
 	void print_all_wilds_of_meld(int meld);
-	int count_all_wilds_of_meld(int meld);
+	std::vector<Card> get_wild_cards(int meld_pos);
 	Card get_card_from_meld(int meld_pos, int card_pos);
+	void clear_transfer_states();
+	void clear_all_data();
+
+
+	void sort();
 
 
 	private:

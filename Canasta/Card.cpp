@@ -45,6 +45,7 @@ Assistance Received: none
 Card::Card(int suit, int face) {
 	translate_to_symbolic_rep(face , suit);
 	calculate_point_value(this->face, this->suit);
+	this->has_transferred = false;
 }
 
 /* *********************************************************************
@@ -75,6 +76,7 @@ Card::Card(const Card& other_card)
 	face = other_card.get_card_face();
 	suit = other_card.get_card_suit();
 	string_representation = other_card.get_card_string();
+	this->has_transferred = other_card.get_has_transferred();
 }
 
 Card Card::operator=(const Card& other_card)
@@ -332,6 +334,43 @@ bool Card::get_has_transferred() const
 	return has_transferred;
 }
 
+int Card::get_numeric_value() const
+{
+	int ascii_offset = 48;
+	
+	switch (face) {
+	case '2':
+	case '3': 
+	case '4': 
+	case '5': 
+	case '6': 
+	case '7': 
+	case '8': 
+	case '9':
+		return (int)face - ascii_offset;
+		break;
+	case 'X':
+		return 10;
+		break;
+	case 'A':
+		return 11;
+		break;
+	case 'J':
+		return ((isdigit(suit)) ? 15 : 12);
+		break;
+	case 'Q': 
+		return 13;
+		break;
+	case 'K': 
+		return 14;
+		break;
+	default: 
+		return -1;
+		break;
+	}
+	
+}
+
 void Card::set_has_transferred(bool has_transferred)
 {
 	this->has_transferred = has_transferred;
@@ -343,4 +382,16 @@ bool operator==(const Card card1, const Card card2)
 		return true;
 	else
 		return false;
+}
+
+bool operator<(const Card card1, const Card card2)
+{
+	//might seem untuitive but remember that numbers are higher up on
+	//the ASCII chart!
+	
+	int card_1_value = card1.get_numeric_value();
+	int card_2_value = card2.get_numeric_value();
+
+	
+	return card_1_value < card_2_value;
 }

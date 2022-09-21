@@ -10,7 +10,7 @@ public:
 	void play(Deck& draw_decks) override ;
 	bool draw(Deck &draw_decks) override;
 	void meld() override;
-	void discard();
+	void discard(Deck& draw_decks) override;
 	void print_player_type() override;
 
 	std::vector<Card> validate_comma_input();
