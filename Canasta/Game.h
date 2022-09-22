@@ -21,7 +21,9 @@ class Human;
 #include <iostream>
 #include <vector>
 #include <string>
-
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 
 class Game {
 public: 
@@ -31,6 +33,7 @@ public:
 	void main_game();
 	~Game();
 	Game(const Game& other_game);
+	void decide_winner();
 	//virtual void play();
 private: 
 	std::vector<Player*> players;

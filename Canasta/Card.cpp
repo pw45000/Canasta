@@ -70,31 +70,16 @@ Card::Card(char face, char suit, std::string string_reprensentation, int point_v
 	this->string_representation = string_reprensentation;
 	this->has_transferred = false;
 }
-Card::Card(const Card& other_card)
+
+Card::Card(std::string string_representation)
 {
-	point_value = other_card.get_point_value();
-	face = other_card.get_card_face();
-	suit = other_card.get_card_suit();
-	string_representation = other_card.get_card_string();
-	this->has_transferred = other_card.get_has_transferred();
+	this->string_representation = string_representation;
+	this->face = string_representation.at(0);
+	this->suit = string_representation.at(1);
+	this->has_transferred = false;
+	calculate_point_value(face, suit);
 }
 
-Card Card::operator=(const Card& other_card)
-{
-	point_value = other_card.get_point_value();
-	face = other_card.get_card_face();
-	suit = other_card.get_card_suit();
-	string_representation = other_card.get_card_string();
-	return *this;
-}
-
-Card::~Card()
-{
-	face = '0';
-	suit = '0';
-	string_representation = "";
-	point_value = 0;
-}
 
 
 

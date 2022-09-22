@@ -37,6 +37,10 @@ public:
 	Card get_card_from_meld(int meld_pos, int card_pos);
 	void clear_transfer_states();
 	void clear_all_data();
+	int get_total_score();
+
+	void set_meld(std::vector<std::vector<Card>> meld_container);
+	void set_hand(std::vector<Card> hand_container);
 
 
 	void sort();

@@ -9,6 +9,10 @@ public:
 	void meld() ;
 	bool draw(Deck &draw_decks) override ;
 	void print_player_type() override;
+	bool choose_to_go_out() override;
+
+	virtual std::string get_player_type() override;
+
 private:
 	int please;
 };

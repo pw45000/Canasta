@@ -222,12 +222,12 @@ void Human::discard(Deck& draw_decks)
 	Card card_to_discard = player_hand.get_card_from_hand(choice);
 	if (card_to_discard.isWild() || card_to_discard.isSpecial()) {
 		draw_decks.discard_push_front(card_to_discard);
-		player_hand.remove_from_hand(card_to_discard);
+		remove_from_hand(card_to_discard);
 		draw_decks.set_discard_freeze(true);
 	}
 	else {
 		draw_decks.discard_push_front(card_to_discard);
-		player_hand.remove_from_hand(card_to_discard);
+		remove_from_hand(card_to_discard);
 		draw_decks.set_discard_freeze(false);
 	}
 
@@ -237,6 +237,23 @@ void Human::discard(Deck& draw_decks)
 void Human::print_player_type()
 {
 	std::cout << "Human:" << std::endl;
+}
+
+bool Human::choose_to_go_out()
+{
+	std::cout << "You can go out, you have a Canasta and have melded all other cards. Do you want to go out?" << std::endl;
+	std::cout << "This action will end the round, and you'll get a bonus 100 points for ending it. " << std::endl;
+	std::cout << "1. Yes" << std::endl;
+	std::cout << "2. No" << std::endl;
+
+	int choice = validate_option_based_input(1, 2);
+	if (choice == 1) return true;
+	else return false;
+}
+
+std::string Human::get_player_type()
+{
+	return "Human";
 }
 
 

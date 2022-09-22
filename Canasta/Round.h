@@ -31,6 +31,17 @@ public:
 	void output_round_info();
 	void sort_players_hands();
 	int pre_turn_menu();
+	void tally_score(); 
+	void set_round_number(int round_number);
+
+
+	bool load_game();
+	bool load_round_number(std::string round_string);
+	bool load_player(std::string player_string);
+	bool load_player_score(int player, std::string round_string);
+	bool string_is_card(std::string card_string);
+	bool load_hand(int player, std::string hand_string);
+	bool load_meld(int player, std::string meld_string);
 
 private: 
 	Deck stock_and_discard;

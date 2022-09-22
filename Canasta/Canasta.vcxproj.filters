@@ -69,4 +69,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="c1.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="c2.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="c3.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="c4.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="c5.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="c6.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

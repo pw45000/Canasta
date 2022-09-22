@@ -107,6 +107,11 @@ void Game::main_game()
 		players.at(0)->clear_hand();
 		players.at(1)->clear_hand();
 	} while (choice != 2);
+	
+
+	decide_winner();
+
+
 	players.clear();
 }
 
@@ -120,6 +125,27 @@ Game::Game(const Game& other_game)
 {
 	players = other_game.players;
 	round = other_game.round;
+}
+
+void Game::decide_winner()
+{
+	auto player_1 = players.at(0);
+	auto player_2 = players.at(1);
+
+
+	int player_1_score = player_1->get_score();
+	int player_2_score = player_2->get_score();
+
+	if (player_1_score > player_2_score) {
+		std::cout << "Victory for life: Player 1 (" << player_1->get_player_type() << ") with a score of" << player_1_score << std::endl;
+		std::cout << "Dejected Loser: Player 2 (" << player_2->get_player_type() << ") with a score of" << player_2_score << std::endl;
+	}
+
+	else {
+		std::cout << "Victory for life: Player 2 (" << player_2->get_player_type() << ") with a score of" << player_2_score << std::endl;
+		std::cout << "Dejected Loser: Player 1 (" << player_1->get_player_type() << ") with a score of" << player_1_score << std::endl;
+	}
+
 }
 
 int validate_option_based_input(int lower_bound, int upper_bound)

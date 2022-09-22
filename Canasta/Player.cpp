@@ -109,6 +109,35 @@ void Player::clear_hand()
 	player_hand.clear_all_data();
 }
 
+bool Player::can_go_out()
+{
+	if (player_hand.hand_empty() == true && has_canasta())
+		return true;
+	else
+		return false;
+}
+
+void Player::add_to_score(int score_addition)
+{
+	score += score_addition;
+}
+
+void Player::set_player_score(int score)
+{
+	this->score = score;
+}
+
+void Player::set_meld(std::vector<std::vector<Card>> meld_container)
+{
+	player_hand.set_meld(meld_container);
+}
+
+void Player::set_hand(std::vector<Card> hand_container)
+{
+	player_hand.set_hand(hand_container);
+}
+
+
 void Player::play(Deck& draw_decks)
 {
 	std::cout << "TODO" << std::endl;

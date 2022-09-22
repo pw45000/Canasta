@@ -26,3 +26,13 @@ void Computer::print_player_type()
 	std::cout << "Computer:" << std::endl;
 }
 
+bool Computer::choose_to_go_out()
+{
+	return true;
+}
+
+std::string Computer::get_player_type()
+{
+	return "Computer";
+}
+

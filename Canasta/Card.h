@@ -14,10 +14,7 @@ public:
 	Card();
 	Card(int suit, int face);
 	Card(char face, char suit, std::string string_reprensentation, int point_value);
-	Card(const Card& other_card);
-	Card operator=(const Card& other_card);
-	~Card();
-	
+	Card(std::string string_representation);
 	void translate_to_symbolic_rep(int face, int value);
 	void calculate_point_value(char face, char value);
 	

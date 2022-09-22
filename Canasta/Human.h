@@ -12,6 +12,8 @@ public:
 	void meld() override;
 	void discard(Deck& draw_decks) override;
 	void print_player_type() override;
+	bool choose_to_go_out() override;
+	virtual std::string get_player_type() override;
 
 	std::vector<Card> validate_comma_input();
 };

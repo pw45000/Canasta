@@ -334,8 +334,8 @@ void Hand::add_to_hand(Card card_to_add)
 
 void Hand::add_to_hand(std::vector<Card> card_to_add)
 {
-	for (card_itr card = card_to_add.begin(); card != card_to_add.end(); card++) {
-		hand_container.push_back(*card);
+	for (int card_pos = 0; card_pos < card_to_add.size();card_pos++ ) {
+		hand_container.push_back(card_to_add.at(card_pos));
 	}
 }
 
@@ -406,6 +406,39 @@ void Hand::clear_all_data()
 {
 	hand_container.clear();
 	meld_container.clear();
+}
+
+int Hand::get_total_score()
+{
+	int hand_score_subtraction = 0;
+	int meld_score_addition = 0;
+	bool is_natural_meld = true;
+
+	for (int card_pos = 0; card_pos < hand_container.size(); card_pos++)
+		hand_score_subtraction += hand_container.at(card_pos).get_point_value();
+
+	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+		for (int meld_card_pos = 0; meld_card_pos < meld_container.at(meld_pos).size(); meld_card_pos++) {
+			if (meld_container.at(meld_pos).at(meld_card_pos).isWild())
+				is_natural_meld = false;
+			meld_score_addition = meld_container.at(meld_pos).at(meld_card_pos).get_point_value();
+		}
+		if (is_natural_meld == true && meld_container.at(meld_pos).size() >= 7)
+			meld_score_addition += 500;
+		else if (is_natural_meld == false && meld_container.at(meld_pos).size() >= 7)
+			meld_score_addition += 300;
+	}
+	return (meld_score_addition - hand_score_subtraction);
+}
+
+void Hand::set_meld(std::vector<std::vector<Card>> meld_container)
+{
+	this-> meld_container = meld_container;
+}
+
+void Hand::set_hand(std::vector<Card> hand_container)
+{
+	add_to_hand(hand_container);
 }
 
 void Hand::sort()

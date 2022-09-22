@@ -49,7 +49,11 @@ int main() {
 	//auto add = Card('J', '1', "J1", 50);
 	//std::cout << add.isWild() << std::endl;;
 
-	Game Canasta;
-	Canasta.main_menu();
+	//Game Canasta;
+	//Canasta.main_menu();
+
+	Round x;
+	x.load_game();
+
 
 }
