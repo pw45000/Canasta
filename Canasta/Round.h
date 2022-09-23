@@ -23,8 +23,12 @@ public:
 	Round(std::vector<Player*> players, int round_number);
 	Round(const Round& other_round);
 	~Round(); 
+
+
+
+
 	int coin_toss();
-	void main_round();
+	void main_round(bool has_loaded_file);
 	void initial_draw();
 	int get_next_player() const;
 	void set_next_player(int next_player);
@@ -33,7 +37,7 @@ public:
 	int pre_turn_menu();
 	void tally_score(); 
 	void set_round_number(int round_number);
-
+	std::vector<Player*> get_players();
 
 	bool load_game();
 	bool load_round_number(std::string round_string);
@@ -42,6 +46,15 @@ public:
 	bool string_is_card(std::string card_string);
 	bool load_hand(int player, std::string hand_string);
 	bool load_meld(int player, std::string meld_string);
+	bool load_stock(std::string stock_string);
+	bool load_discard(std::string discard_string);
+	bool load_next_player(std::string next_plr_string);
+
+	void set_stock_pile(std::vector<Card> stock_pile);
+	void set_discard_pile(std::vector<Card> discard_pile);
+
+	void save_round();
+
 
 private: 
 	Deck stock_and_discard;

@@ -27,9 +27,17 @@ public:
 	Card get_top_discard_pile();
 	void print_stock_pile();
 	void print_top_of_discard_pile();
+	void print_discard_pile();
 	void discard_push_front(Card pushed_card);
 	void set_discard_freeze(bool is_frozen);
 	void clear_discard();
+
+
+	void print_top_of_stock();
+	void set_discard_pile(std::vector<Card> discard_pile);
+	void set_stock_pile(std::vector<Card> stock_pile);
+
+
 private: 
 	//While it was tempting to use a deque
 	//since the datastructure not only sounds like a deck

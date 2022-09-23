@@ -37,14 +37,20 @@ public:
 	void set_hand(std::vector<Card> hand_container);
 
 
-	virtual void play(Deck& draw_decks) = 0;
+	virtual bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	//virtual void strategy();
 	virtual bool draw(Deck &draw_decks) = 0;
 	virtual void meld();
-	virtual void discard(Deck& draw_decks) = 0;
+	virtual void discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	virtual void print_player_type() = 0;
 	virtual bool choose_to_go_out() = 0;
 	virtual std::string get_player_type() = 0;
+	
+	
+	
+	bool go_out();
+
+
 private:
 	int score;
 	Hand player_hand;

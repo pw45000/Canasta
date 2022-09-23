@@ -8,7 +8,7 @@ int Round::coin_toss()
 
 	std::string choice;
 	auto flipped_coin = coin(dev);
-	std::cout << "Player 1! Heads or Tails?" << std::endl;
+	std::cout << "Player 2! Heads or Tails?" << std::endl;
 	std::cout << "1. Heads" << std::endl;
 	std::cout << "2. Tails" << std::endl;
 	do {
@@ -24,12 +24,12 @@ int Round::coin_toss()
 
 	if (std::stoi(choice) == flipped_coin) {
 		std::cout << "Player 1 goes first! They guessed correctly, the value is " << flipped_coin << std::endl;
-		return 1;
+		return 2;
 	}
 
 	else {
 		std::cout << "Player 2 goes first! Player 1 guessed incorrectly the value is "<< flipped_coin << std::endl;
-		return 2; 
+		return 1; 
 	}
 
 	
@@ -38,40 +38,57 @@ int Round::coin_toss()
 
 }
 
-void Round::main_round()
+void Round::main_round(bool has_loaded_file)
 {
 	auto player1 = players.at(0);
 	auto player2 = players.at(1);
 	int menu_choice = 0;
 	bool round_is_over = false;
 
-	if (player1->get_score() == player2->get_score()) {
-		//the coin toss decides which player is going next.
-		//so, we'll need to set the result for it's return.
-		set_next_player(coin_toss());
-	}
+	if (has_loaded_file == false) {
+		if (player1->get_score() == player2->get_score()) {
+			//the coin toss decides which player is going next.
+			//so, we'll need to set the result for it's return.
+			set_next_player(coin_toss());
+		}
 
-	initial_draw();
-	sort_players_hands();
+		initial_draw();
+		sort_players_hands();
+	}
 	output_round_info();
 	
 	do {
-		if (next_player == 1) {
+		do {
 			menu_choice = pre_turn_menu();
-			if (menu_choice == 4) break;
-			output_round_info();
-			bool can_go_out = player1->can_go_out();
-			if (can_go_out) {
-				bool chose_to_go_out = player1->choose_to_go_out();
 
-				if (chose_to_go_out) {
-					player1->add_to_score(100);
-					break;
-				}
+			switch (menu_choice) {
+			case 1:
+				sort_players_hands();
+				save_round();
+				break;
+			case 2:
+				continue;
+				break;
+			case 3:
+				continue;
+				break;
+			case 4:
+				round_is_over = true;
+				break;
 			}
 
+		} while (menu_choice != 4 && menu_choice != 2);
+		output_round_info();
 
-			player1->play(stock_and_discard);
+		if (round_is_over == true) break;
+		
+		
+		if (next_player == 1) {
+			output_round_info();
+
+			Hand enemy_hand = player2->get_player_hand();
+			std::vector<std::vector<Card>> enemy_meld = enemy_hand.get_meld();
+			round_is_over = player1->play(stock_and_discard, enemy_meld);
 			player1->clear_transfer_states();
 			//we'll need to increment next player to pass the turn.
 			next_player++;
@@ -79,24 +96,9 @@ void Round::main_round()
 
 
 		else {
-			menu_choice = pre_turn_menu();
-			if (menu_choice == 4) break;
-			output_round_info();
-
-
-
-			bool can_go_out = player2->can_go_out();
-			if (can_go_out) {
-				bool chose_to_go_out = player2->choose_to_go_out();
-
-				if (chose_to_go_out) {
-					player2->add_to_score(100);
-					break;
-				}
-			}
-
-
-			player2->play(stock_and_discard);
+			Hand enemy_hand = player1->get_player_hand();
+			std::vector<std::vector<Card>> enemy_meld = enemy_hand.get_meld();
+			round_is_over = player2->play(stock_and_discard, enemy_meld);
 			player2->clear_transfer_states();
 			//since 2 is bigger than 1, we'll need to decrement 
 			//to get the next player to be 1.
@@ -112,6 +114,7 @@ void Round::main_round()
 	
 
 }
+
 
 void Round::initial_draw()
 {
@@ -155,6 +158,7 @@ void Round::output_round_info()
 
 
 	player_1->print_player_type();
+	std::cout <<":"<< std::endl;
 	std::cout << "   Score: " << player_1->get_score() << std::endl;
 
 	std::cout << "   Hand: ";
@@ -165,6 +169,7 @@ void Round::output_round_info()
 
 
 	player_2->print_player_type();
+	std::cout << ":" << std::endl;
 	std::cout << "   Score: " << player_2->get_score() << std::endl;
 
 	std::cout << "   Hand: ";
@@ -175,12 +180,14 @@ void Round::output_round_info()
 
 	std::cout << "Stock: ";
 	stock_and_discard.print_stock_pile();
-	std::cout << "Discard Pile:";
-	stock_and_discard.print_top_of_discard_pile();
+	std::cout << "Discard Pile: ";
+	stock_and_discard.print_discard_pile();
 
-
+	std::cout<<std::endl;
 	std::cout << "Next Player: ";
 	(next_player == 1) ? player_1->print_player_type() : player_2->print_player_type();
+	std::cout << std::endl;
+
 	std::cout << std::endl;
 }
 
@@ -215,13 +222,22 @@ void Round::set_round_number(int round_number)
 	this->round_number = round_number;
 }
 
+std::vector<Player*> Round::get_players()
+{
+	return players;
+}
+
 bool Round::load_game()
 {
-	std::ifstream file_to_load("c1.txt");
+	std::cout << "Please enter the file you wish to load. " << std::endl;
+	std::string input_file_name;
+	getline(std::cin, input_file_name);
+	std::ifstream file_to_load(input_file_name);
 	std::string extracted_string;
 	std::vector<std::string> lines_to_parse;
+	bool load_success = true;
 
-	if (std::filesystem::exists("c1.txt")) {
+	if (std::filesystem::exists(input_file_name)) {
 		while (getline(file_to_load, extracted_string)) {
 			std::istringstream ss(extracted_string);
 
@@ -246,7 +262,7 @@ bool Round::load_game()
 		return false;
 	}
 
-	if (false) {
+	if (lines_to_parse.size()!=12) {
 		std::cout << "The load file has either too little or too much information!" << std::endl;
 		return false;
 	}
@@ -256,44 +272,53 @@ bool Round::load_game()
 			std::string line_to_parse = lines_to_parse.at(line_pos);
 			switch (line_pos) {
 			case 0: 
-				load_round_number(line_to_parse);
+				load_success = load_round_number(line_to_parse);
 				break;
 			case 1: 
-				load_player(line_to_parse);
+				load_success = load_player(line_to_parse);
 				break;
 			case 2:
-				load_player_score(0, line_to_parse);
+				load_success = load_player_score(0, line_to_parse);
 				break;
 			case 3: 
-				load_hand(0,line_to_parse);
+				load_success = load_hand(0,line_to_parse);
 				break;
 			case 4: 
-				load_meld(0, line_to_parse);
+				load_success = load_meld(0, line_to_parse);
 				break;
 			case 5:
-				load_player(line_to_parse);
+				load_success = load_player(line_to_parse);
 				break;
 			case 6:
-				load_player_score(1, line_to_parse);
+				load_success = load_player_score(1, line_to_parse);
 				break;
 			case 7: 
-				load_hand(1,line_to_parse);
+				load_success = load_hand(1,line_to_parse);
 				break;
 			case 8: 
-				load_meld(1, line_to_parse);
+				load_success = load_meld(1, line_to_parse);
+				break;
+			case 9: 
+				load_success = load_stock(line_to_parse);
+				break;
+			case 10: 
+				load_success = load_discard(line_to_parse);
+				break;
+			case 11: 
+				load_success = load_next_player(line_to_parse);
 				break;
 			}
 		}
 	}
 
+	file_to_load.close();
+	output_round_info();
 
 
+	return load_success;
 
 	//https://stackoverflow.com/questions/3946558/c-read-from-text-file-and-separate-into-variable
 
-	file_to_load.close();
-
-	return true;
 
 
 
@@ -326,13 +351,11 @@ bool Round::load_round_number(std::string round_string)
 bool Round::load_player(std::string player_string)
 {
 	if (player_string == "Human:") {
-		Human player_addition;
-		players.push_back(&player_addition);
+		players.push_back(new Human);
 		return true;
 	}
 	else if (player_string == "Computer:") {
-		Computer player_addition;
-		players.push_back(&player_addition);
+		players.push_back(new Computer);
 		return true;
 	}
 	else {
@@ -403,27 +426,36 @@ bool Round::load_hand(int player, std::string hand_string)
 		std::string card_string;
 		hand_extractor >> card_string;
 
+		if (card_string=="")
+			break;
+
 		if (string_is_card(card_string)) {
 			converted_hand.push_back(Card(card_string));
 		}
 
-	} while (hand_extractor);
+		else {
+			return false;
+		}
 
+	} while (hand_extractor);
 	players.at(player)->set_hand(converted_hand);
 	
 
 	return true;
 }
 
-bool Round::load_meld(int player, std::string meld_string)
+bool Round::load_meld(int player, std::string pre_meld_string)
 {
-	std::string melds = meld_string.substr(meld_string.find(" ") + 1);
+	std::string melds = pre_meld_string.substr(pre_meld_string.find(" ") + 1);
 	std::vector<Card> converted_meld;
 	std::vector<std::vector<Card>> converted_meld_container;
 	std::istringstream meld_extractor(melds);
-	do {
-		std::string meld_string;
-		meld_extractor >> meld_string;
+	std::string meld_string;
+	std::string card_string;
+	while (getline(meld_extractor, meld_string, ']')) {
+
+		if (meld_string == "" || meld_string == " ")
+			break;
 
 		//https://www.tutorialspoint.com/how-to-remove-certain-characters-from-a-string-in-cplusplus
 		meld_string.erase(std::remove(meld_string.begin(), meld_string.end(), '['), meld_string.end());
@@ -431,21 +463,141 @@ bool Round::load_meld(int player, std::string meld_string)
 
 		std::istringstream card_extractor(meld_string);
 
-		do {
-			std::string card_string;
-			card_extractor >> card_string;
+		while (card_extractor >> card_string) {
+			if (card_string == "")
+				break;
+
 			if (string_is_card(card_string)) {
 				converted_meld.push_back(Card(card_string));
 			}
+
+			else {
+				return false;
+			}
 		}
-		while (card_extractor);
+
 		converted_meld_container.push_back(converted_meld);
-	} while (meld_extractor);
+		converted_meld.clear();
+		card_extractor.clear();
+
+		meld_extractor.clear();
+	}
 	players.at(player)->set_meld(converted_meld_container);
 	return true;
 }
 
+bool Round::load_stock(std::string stock_string)
+{
+	std::string stock = stock_string.substr(stock_string.find(" ") + 1);
+	std::vector<Card> converted_stock;
 
+	std::istringstream stock_extractor(stock);
+	do {
+		std::string card_string;
+		stock_extractor >> card_string;
+
+		if (card_string == "")
+			break;
+
+		if (string_is_card(card_string)) {
+			converted_stock.push_back(Card(card_string));
+		}
+
+		else {
+			return false;
+		}
+
+	} while (stock_extractor);
+
+	//std::reverse(converted_stock.begin(), converted_stock.end());
+	
+	set_stock_pile(converted_stock);
+
+	return true;
+}
+
+bool Round::load_discard(std::string discard_string)
+{
+	std::string discard = discard_string.substr(discard_string.find(" ") + 1);
+	 discard = discard_string.substr(discard_string.find(":") + 1);
+	std::vector<Card> converted_discard;
+
+	std::istringstream discard_extractor(discard);
+	do {
+		std::string card_string;
+		discard_extractor >> card_string;
+
+		if (card_string == "")
+			break;
+
+
+		if (string_is_card(card_string)) {
+			converted_discard.push_back(Card(card_string));
+		}
+
+		else {
+			return false;
+		}
+
+
+	} while (discard_extractor);
+
+	//std::reverse(converted_discard.begin(), converted_discard.end());
+	set_discard_pile(converted_discard);
+
+	return true;
+}
+
+bool Round::load_next_player(std::string next_player_str) {
+	
+	next_player_str = next_player_str.substr(next_player_str.find(" ") + 1);
+	
+	if (next_player_str == "Player: Human") {
+		set_next_player(2);
+		return true;
+	}
+	else if (next_player_str == "Player: Computer") {
+		set_next_player(1);
+		return true;
+	}
+	else {
+		std::cout << "File loading error: next player is not Human or Computer!" << std::endl;
+		return false;
+	}
+}
+
+void Round::set_stock_pile(std::vector<Card> stock_pile)
+{
+	stock_and_discard.set_stock_pile(stock_pile);
+}
+
+void Round::set_discard_pile(std::vector<Card> discard_pile)
+{
+	stock_and_discard.set_discard_pile(discard_pile);
+}
+
+void Round::save_round()
+{
+	std::string file_name; 
+	std::cout << "What would you like to save your file as? Say quit to cancel saving." << std::endl;
+
+	if (file_name == "quit")
+		return;
+
+	getline(std::cin, file_name);
+	
+	std::ofstream out(file_name);
+	std::streambuf* coutbuf = std::cout.rdbuf(); //save old buf
+	std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
+	
+	output_round_info();
+
+	std::cout.rdbuf(coutbuf);  //reset to standard output again
+
+
+	
+	
+}
 
 
 
@@ -500,8 +652,8 @@ Round::Round(const Round& other_round)
 }
 
 //https://stackoverflow.com/questions/20814703/should-i-delete-static-object-in-c
-//empty for now due to this.
+//empty for now due to the class Game taking care of the anonymous variable. 
 Round::~Round()
 {
-	players.clear();
+	stock_and_discard.clear_discard();
 }

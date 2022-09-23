@@ -12,36 +12,47 @@ Game::Game()
 
 }
 
+Game::~Game() {
+	if (players.size() > 0) {
+		delete players.at(0);
+		delete players.at(1);
+	}
+}
+
+
+
 void Game::main_menu()
 {
 	std::string input_string;
-	std::cout << "Welcome to Canasta! Please pick an option:" << std::endl;
-	std::cout << "1. New Game " << std::endl;
-	std::cout << "2. Load Game" << std::endl;
-	std::cout << "3. Exit" << std::endl;
 
-	int choice = validate_option_based_input(1, 3);
+
+	int choice = 0;
 	
 	//to avoid stopping after the first return to main menu.
 	do {
+		std::cout << "Welcome to Canasta! Please pick an option:" << std::endl;
+		std::cout << "1. New Game " << std::endl;
+		std::cout << "2. Load Game" << std::endl;
+		std::cout << "3. Exit" << std::endl;
+		choice = validate_option_based_input(1, 3);
 		switch (choice) {
 		case 1:
-			choose_player_type();
-
-			//scrappy way of redisplaying the prompt. 
-			std::cout << "Welcome to Canasta! Please pick an option:" << std::endl;
-			std::cout << "1. New Game " << std::endl;
-			std::cout << "2. Load Game" << std::endl;
-			std::cout << "3. Exit" << std::endl;
-			choice = validate_option_based_input(1, 3);
+			choose_player_type();			
 			break;
-		case 2:
-			std::cout << "TODO: IMPLEMENT LOAD" << std::endl;
-			return;
+		case 2: {
+			Round loading_round;
+			bool load_success = loading_round.load_game();
+			if (load_success) {
+				players = loading_round.get_players();
+				main_game(loading_round);
+			}
+			else
+				std::cout << "Failed to load file!" << std::endl;
 			break;
-		case 3:
-			//We'll need this, or there's some weird behavior with recursion....
+		}
+		case 3: {
 			return;
+		}
 		default:
 			std::cout << "Unknown behavior: unknown option." << std::endl;
 		}
@@ -67,10 +78,9 @@ void Game::choose_player_type()
 		case 1:
 			//bypass the error of case transfer skipping initialization
 		{
-			Human player1;
-			Human player2;
-			players.push_back(&player1);
-			players.push_back(&player2);
+
+			players.push_back(new Human);
+			players.push_back(new Human);
 
 			main_game();
 
@@ -79,7 +89,10 @@ void Game::choose_player_type()
 			break;
 		}
 		case 2:
-			std::cout << "TODO: IMPLEMENT PVE" << std::endl;
+			players.push_back(new Computer);
+			players.push_back(new Human);
+
+			main_game();
 			break;
 		case 3:
 			return;
@@ -99,27 +112,57 @@ void Game::main_game()
 	do {
 		round_number++;
 		Round game_round(players, round_number);
-		game_round.main_round();
+		game_round.main_round(false);
 		std::cout << "Would you like to another round?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
-		players.at(0)->clear_hand();
-		players.at(1)->clear_hand();
 	} while (choice != 2);
 	
 
 	decide_winner();
 
-
+	delete players.at(0);
+	delete players.at(1);
 	players.clear();
+
+}
+
+
+
+void Game::main_game(Round &loaded_round)
+{
+	int choice = 0;
+	int round_number = 0;
+	int loop_count = 0;
+
+
+
+	do {
+		if (loop_count == 0)
+			loaded_round.main_round(true);
+		else {
+			Round game_round(players, round_number);
+			game_round.main_round(false);
+		}
+		std::cout << "Would you like to another round?" << std::endl;
+		std::cout << "1. Yes" << std::endl;
+		std::cout << "2. No" << std::endl;
+		choice = validate_option_based_input(1, 2);
+		round_number++;
+		
+	} while (choice != 2);
+
+
+	decide_winner();
+
+	delete players.at(0);
+	delete players.at(1);
+
 }
 
 //https://stackoverflow.com/questions/20814703/should-i-delete-static-object-in-c
 //empty for now due to this.
-Game::~Game()
-{
-}
 
 Game::Game(const Game& other_game)
 {
@@ -137,8 +180,8 @@ void Game::decide_winner()
 	int player_2_score = player_2->get_score();
 
 	if (player_1_score > player_2_score) {
-		std::cout << "Victory for life: Player 1 (" << player_1->get_player_type() << ") with a score of" << player_1_score << std::endl;
-		std::cout << "Dejected Loser: Player 2 (" << player_2->get_player_type() << ") with a score of" << player_2_score << std::endl;
+		std::cout << "Victory for life: Player 1 (" << player_1->get_player_type() << ") with a score of " << player_1_score << std::endl;
+		std::cout << "Dejected Loser: Player 2 (" << player_2->get_player_type() << ") with a score of " << player_2_score << std::endl;
 	}
 
 	else {

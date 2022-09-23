@@ -137,25 +137,23 @@ void Player::set_hand(std::vector<Card> hand_container)
 	player_hand.set_hand(hand_container);
 }
 
-
-void Player::play(Deck& draw_decks)
-{
-	std::cout << "TODO" << std::endl;
+void Player::meld() {
+	return;
 }
 
-bool Player::draw(Deck &draw_decks)
-{
-	return false;
-}
 
-void Player::meld()
+bool Player::go_out()
 {
-	std::cout << "TODO" << std::endl;
-}
+	bool able_to_go_out = can_go_out();
+	bool did_chose_to_go_out = false;
+	if (able_to_go_out) {
+		did_chose_to_go_out = choose_to_go_out();
 
-void Player::discard(Deck& draw_decks)
-{
-	std::cout << "TODO" << std::endl;
+		if (did_chose_to_go_out) {
+			add_to_score(100);
+		}
+	}
+	return did_chose_to_go_out;
 }
 
 

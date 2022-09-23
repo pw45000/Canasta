@@ -134,6 +134,13 @@ void Deck::print_top_of_discard_pile()
 	}
 }
 
+void Deck::print_discard_pile()
+{
+	for (Card card : discard_pile)
+		std::cout << card.get_card_string() << " ";
+	std::cout << std::endl;
+}
+
 void Deck::discard_push_front(Card pushed_card)
 {
 	discard_pile.insert(discard_pile.begin(), pushed_card);
@@ -148,6 +155,22 @@ void Deck::set_discard_freeze(bool is_frozen)
 void Deck::clear_discard()
 {
 	discard_pile.clear();
+}
+
+void Deck::print_top_of_stock()
+{
+	if (stock_pile.size() > 0)
+		std::cout << stock_pile.at(0).get_card_string() << std::endl;
+}
+
+void Deck::set_discard_pile(std::vector<Card> discard_pile)
+{
+	this->discard_pile = discard_pile;
+}
+
+void Deck::set_stock_pile(std::vector<Card> stock_pile)
+{
+	this->stock_pile = stock_pile;
 }
 
 

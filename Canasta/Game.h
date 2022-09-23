@@ -31,6 +31,7 @@ public:
 	void main_menu();
 	void choose_player_type();
 	void main_game();
+	void main_game(Round &loaded_round);
 	~Game();
 	Game(const Game& other_game);
 	void decide_winner();

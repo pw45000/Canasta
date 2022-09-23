@@ -1,11 +1,29 @@
 #include "Human.h"
 #include <iostream>
 
-void Human::play(Deck& draw_decks)
+bool Human::play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_meld)
 {
-	draw(draw_decks);
+	bool immeadiate_break;
+	
+
+	immeadiate_break = go_out();
+	if (immeadiate_break) return true;
+	
+	immeadiate_break = draw(draw_decks);
+	if (immeadiate_break) return true;
+	
 	meld();
-	discard(draw_decks);
+	immeadiate_break = go_out();
+	if (immeadiate_break) return true;
+	
+	discard(draw_decks, enemy_meld);
+	immeadiate_break = go_out();
+	if (immeadiate_break) return true;
+	
+	
+	return false;
+
+
 }
 
 bool Human::draw(Deck &draw_decks)
@@ -13,6 +31,10 @@ bool Human::draw(Deck &draw_decks)
 	std::cout << "DRAW PHASE: Pick a Deck to draw from. " << std::endl;
 	std::cout << "1. Stock" << std::endl;
 	std::cout << "2. Discard " << std::endl;
+
+	std::cout << "Discard Pile: " << std::endl;
+	draw_decks.print_discard_pile();
+
 
 	bool has_completed_draw = false;
 	bool stock_is_empty;
@@ -59,11 +81,15 @@ bool Human::draw(Deck &draw_decks)
 		);
 
 
-	if (!(draw_decks.both_piles_are_empty()) && !(!draw_decks.stock_is_empty() && !draw_decks.get_discard_is_frozen())) {
-		return true;
+	if (!(draw_decks.both_piles_are_empty()) && (!draw_decks.stock_is_empty() && !draw_decks.get_discard_is_frozen())) {
+		return false;
+	}
+
+	else if (draw_decks.get_discard_is_frozen() && !draw_decks.stock_is_empty()) {
+		return false;
 	}
 	else {
-		return false;
+		return true;
 	}
 
 }
@@ -210,11 +236,15 @@ void Human::meld()
 
 }
 
-void Human::discard(Deck& draw_decks)
+void Human::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds)
 {
 	temp_print_hand();
+	print_enemy_meld(enemy_melds);
 	Hand player_hand = get_player_hand();
 	int size_of_hand = player_hand.get_size_of_hand();
+
+
+
 	std::cout << "DISCARD Phase: What card would you like to discard? Select a position from 1 to " 
 		<< size_of_hand << std::endl;
 	int choice = validate_option_based_input(0, size_of_hand) - 1;
@@ -236,7 +266,7 @@ void Human::discard(Deck& draw_decks)
 
 void Human::print_player_type()
 {
-	std::cout << "Human:" << std::endl;
+	std::cout << "Human";
 }
 
 bool Human::choose_to_go_out()
@@ -255,6 +285,20 @@ std::string Human::get_player_type()
 {
 	return "Human";
 }
+
+void Human::print_enemy_meld(std::vector<std::vector<Card>> enemy_meld)
+{
+	std::cout << "Opponent's melds: " << std::endl;
+	for (int meld_pos = 0; meld_pos < enemy_meld.size(); meld_pos++) {
+		std::cout << "[ ";
+		for (int card_pos = 0; card_pos < enemy_meld.at(meld_pos).size(); card_pos++)
+			std::cout << enemy_meld.at(meld_pos).at(card_pos).get_card_string()<<" ";
+		std::cout << "] ";
+	}
+	std::cout << std::endl;
+}
+
+
 
 
 std::vector<Card> Human::validate_comma_input()

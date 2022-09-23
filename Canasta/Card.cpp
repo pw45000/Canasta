@@ -8,6 +8,76 @@
 
 
 
+Card::~Card()
+{
+	face = '0';
+	suit = '0';
+	string_representation = "";
+	point_value = 0;
+	has_transferred = false;
+}
+
+
+
+Card::Card(const Card& other_card)
+{
+	point_value = other_card.get_point_value();
+	face = other_card.get_card_face();
+	suit = other_card.get_card_suit();
+	string_representation = other_card.get_card_string();
+	this->has_transferred = other_card.get_has_transferred();
+}
+
+Card Card::operator=(const Card& other_card)
+{
+	this->face = other_card.face;
+	this->suit = other_card.suit;
+	this->point_value = other_card.point_value;
+	this->string_representation = other_card.string_representation;
+	this->has_transferred = other_card.has_transferred;
+
+	return *this;
+
+}
+
+Card::Card(Card&& other_card)
+{
+	this->face = other_card.face;
+	this->suit = other_card.suit;
+	this->point_value = other_card.point_value;
+	this->string_representation = other_card.string_representation;
+	this->has_transferred = other_card.has_transferred;
+
+
+	other_card.face = '0';
+	other_card.suit = '0';
+	other_card.string_representation = "";
+	other_card.point_value = 0;
+	other_card.has_transferred = false;
+
+}
+
+Card Card::operator=(Card&& other_card)
+{
+	this->face = other_card.face;
+	this->suit = other_card.suit;
+	this->point_value = other_card.point_value;
+	this->string_representation = other_card.string_representation;
+	this->has_transferred = other_card.has_transferred;
+
+	//avoids destruction of self.
+	if (&other_card != this) {
+		other_card.face = '0';
+		other_card.suit = '0';
+		other_card.string_representation = "";
+		other_card.point_value = 0;
+		other_card.has_transferred = false;
+	}
+	return *this;
+}
+
+
+
 
 
 /* *********************************************************************
@@ -121,7 +191,7 @@ void Card::calculate_point_value(char face, char suit) {
 		break;
 	case '8': 
 	case '9': 
-	case '10': 
+	case 'X': 
 	case 'J':
 	case 'Q':
 	case 'K': 

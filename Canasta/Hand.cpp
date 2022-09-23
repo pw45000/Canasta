@@ -2,6 +2,8 @@
 Hand::Hand() {
 	hand_container.reserve(15);
 	meld_container.reserve(15);
+	hand_container.resize(0);
+	hand_container.resize(0);
 }
 
 Hand::Hand(std::vector<Card> debug_hand)
@@ -281,7 +283,7 @@ bool Hand::is_not_duplicate_meld(char rank)
 
 bool Hand::hand_empty()
 {
-	bool hand_is_empty = (meld_container.size() == 0) ? true : false;
+	bool hand_is_empty = (hand_container.size() == 0) ? true : false;
 	return hand_is_empty;
 }
 
@@ -388,6 +390,11 @@ std::vector<Card> Hand::get_wild_cards(int meld_pos)
 	return wild_meld;
 }
 
+std::vector<std::vector<Card>> Hand::get_meld()
+{
+	return meld_container;
+}
+
 Card Hand::get_card_from_meld(int meld_pos, int card_pos)
 {
 	return meld_container.at(meld_pos).at(card_pos);
@@ -421,24 +428,32 @@ int Hand::get_total_score()
 		for (int meld_card_pos = 0; meld_card_pos < meld_container.at(meld_pos).size(); meld_card_pos++) {
 			if (meld_container.at(meld_pos).at(meld_card_pos).isWild())
 				is_natural_meld = false;
-			meld_score_addition = meld_container.at(meld_pos).at(meld_card_pos).get_point_value();
+			meld_score_addition += meld_container.at(meld_pos).at(meld_card_pos).get_point_value();
 		}
 		if (is_natural_meld == true && meld_container.at(meld_pos).size() >= 7)
 			meld_score_addition += 500;
 		else if (is_natural_meld == false && meld_container.at(meld_pos).size() >= 7)
 			meld_score_addition += 300;
 	}
-	return (meld_score_addition - hand_score_subtraction);
+
+	int total_score = meld_score_addition - hand_score_subtraction;
+
+	return (total_score);
 }
 
-void Hand::set_meld(std::vector<std::vector<Card>> meld_container)
+std::vector<Card> Hand::get_hand_container() const
+{
+	return hand_container;
+}
+
+void Hand::set_meld(std::vector<std::vector<Card>> &meld_container)
 {
 	this-> meld_container = meld_container;
 }
 
-void Hand::set_hand(std::vector<Card> hand_container)
+void Hand::set_hand(std::vector<Card> &hand_container)
 {
-	add_to_hand(hand_container);
+	this->hand_container = hand_container;
 }
 
 void Hand::sort()
