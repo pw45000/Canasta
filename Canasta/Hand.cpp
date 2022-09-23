@@ -29,10 +29,26 @@ bool Hand::transfer_wild_card(Card transfer, int wild_origin, int meld_target) {
 		}
 
 
+		if (meld_target == -2) {
+			
+			if (is_meldable(transfer)) {
+				auto wild_itr = std::find(meld_container.at(wild_origin).begin(), meld_container.at(wild_origin).end(), transfer);
+				meld_container.at(wild_origin).erase(wild_itr);
+				hand_container.push_back(transfer);
+				return true;
+			}
+			else {
+				std::cout << "Can't transfer wild card: you can't make any melds with the hand!" << std::endl;
+				return false;
+			}
+
+		}
+
+
 		//checks if wild_card exists within it's designated meld.
 		auto wild_itr = std::find(meld_container.at(wild_origin).begin(), meld_container.at(wild_origin).end(), transfer);
 		//if the wild card is found and the meld isn't the minimum of a meld, transfer the wild card over.
-		if (wild_itr != meld_container.at(wild_origin).end() && meld_container.at(meld_target).size() <= 3) {
+		if (wild_itr != meld_container.at(wild_origin).end() && meld_container.at(meld_target).size() >= 3) {
 			meld_container.at(wild_origin).erase(wild_itr);
 			transfer.set_has_transferred(true);
 			meld_container.at(meld_target).push_back(transfer);

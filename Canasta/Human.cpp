@@ -204,7 +204,14 @@ void Human::meld()
 
 					std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
 						<< " to add onto. Enter 0 cancel the operation." << std::endl;
-					meld_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
+					std::cout << "Also, input"; 
+					player_hand.get_size_of_meld(); 
+					std::cout<<" if you want to transfer the wild card back to the hand.You can only do this" <<
+						"if you can create a meld with the cards in the hand." << std::endl;
+					meld_pos = validate_option_based_input(-1, player_hand.get_size_of_meld());
+
+
+
 
 					//this is if the user enters 0.
 					if (meld_pos == -1) break;

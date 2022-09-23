@@ -30,25 +30,8 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 	Card preferred_card;
 	
 	auto three_spades_itr = std::find(hand_container.begin(), hand_container.end(), Card("3S"));
-	if (three_spades_itr != hand_container.end()) {
-		draw_decks.discard_push_front(*three_spades_itr);
-		remove_from_hand(*three_spades_itr);
-		std::cout << "The CPU chose to get rid of a three of spades since it can't make melds with it." << std::endl;
-		return;
-	}
-
-	auto three_clubs_itr = std::find(hand_container.begin(), hand_container.end(), Card("3S"));
-	if (three_clubs_itr != hand_container.end()) {
-		draw_decks.discard_push_front(*three_clubs_itr);
-		remove_from_hand(*three_clubs_itr);
-		std::cout << "The CPU chose to get rid of a three of clubs since it can't make melds with it." << std::endl;
-		return;
-	}
-
-
-
-
-
+	auto three_clubs_itr = std::find(hand_container.begin(), hand_container.end(), Card("3C"));
+	
 	for (int card_pos = 0; card_pos < hand_container.size(); card_pos++) {
 		Card card_to_search = hand_container.at(card_pos);
 		for (int meld_pos = 0; meld_pos < enemy_melds.size(); meld_pos++) {
@@ -65,7 +48,24 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 
 	}
 
-	if (preference_discard.size() != 0) {
+	if (three_spades_itr != hand_container.end()) {
+		preferred_card = *three_spades_itr;
+		draw_decks.discard_push_front(*three_spades_itr);
+		remove_from_hand(*three_spades_itr);
+		std::cout << "The CPU chose to get rid of a three of spades since it can't make melds with it." << std::endl;
+		return;
+	}
+
+
+	else if (three_clubs_itr != hand_container.end()) {
+		preferred_card = *three_clubs_itr;
+		draw_decks.discard_push_front(*three_clubs_itr);
+		remove_from_hand(*three_clubs_itr);
+		std::cout << "The CPU chose to get rid of a three of clubs since it can't make melds with it." << std::endl;
+		return;
+	}
+
+	else if (preference_discard.size() != 0) {
 		preferred_card = preference_discard.at(0);
 		
 		std::cout << "The CPU chose to get rid of " << preferred_card.get_card_string() << " since it the lowest value  " <<
@@ -73,9 +73,7 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 	}
 
 	else if (no_wild_discard.size()!= 0) {
-		static thread_local std::mt19937 g{ std::random_device{}() };
-		static thread_local std::uniform_int_distribution<size_t> d{ 0,no_wild_discard.size() };
-		preferred_card = no_wild_discard.at(d(g));
+		preferred_card = no_wild_discard.at(0);
 
 		std::cout << "The CPU chose to get rid of " << preferred_card.get_card_string() << " since it the lowest value  " <<
 			"In the CPU's hand, @" << preferred_card.get_point_value() << " points, and wasn't a wild card." << std::endl;
@@ -131,7 +129,7 @@ bool Computer::draw(Deck &draw_decks)
 		if (draw_decks.get_discard_is_frozen())
 			std::cout << "the discard pile is frozen." << std::endl;
 		else if (!can_meld)
-			std::cout << "there are no cards in the CPU's hand that can meld with the card" << can_meld << std::endl;
+			std::cout << "there are no cards in the CPU's hand that can meld with the card " << top_of_discard.get_card_string() << std::endl;
 		else {
 			std::cout << "The bot wants to keep a small hand." << std::endl;
 		}

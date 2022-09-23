@@ -137,6 +137,11 @@ void Player::set_hand(std::vector<Card> hand_container)
 	player_hand.set_hand(hand_container);
 }
 
+void Player::clear_hand_and_meld()
+{
+	player_hand.clear_all_data();
+}
+
 void Player::meld() {
 	return;
 }

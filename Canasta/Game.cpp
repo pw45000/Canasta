@@ -63,16 +63,17 @@ void Game::main_menu()
 void Game::choose_player_type()
 {
 	std::string input_string;
-	std::cout << "Welcome to Canasta! Please select your preferred game type: " << std::endl;
-	std::cout << "1. Player vs Player (PVP) " << std::endl;
-	std::cout << "2. Player vs Computer (PVE)" << std::endl;
-	std::cout << "3. Exit to Main Menu" << std::endl;
+
 
 	
 	int choice;
 	//to avoid stopping after the first return to main menu.
 	do {
 		//because we have 3 options.
+		std::cout << "Welcome to Canasta! Please select your preferred game type: " << std::endl;
+		std::cout << "1. Player vs Player (PVP) " << std::endl;
+		std::cout << "2. Player vs Computer (PVE)" << std::endl;
+		std::cout << "3. Exit to Main Menu" << std::endl;
 		choice = validate_option_based_input(1, 3);
 		switch (choice) {
 		case 1:
@@ -93,6 +94,7 @@ void Game::choose_player_type()
 			players.push_back(new Human);
 
 			main_game();
+			return;
 			break;
 		case 3:
 			return;
@@ -108,6 +110,8 @@ void Game::main_game()
 {
 	int choice = 0;
 	int round_number = 0;
+	auto player_1 = players.at(0);
+	auto player_2 = players.at(1);
 
 	do {
 		round_number++;
@@ -117,6 +121,8 @@ void Game::main_game()
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
+		player_1->clear_hand_and_meld();
+		player_2->clear_hand_and_meld();
 	} while (choice != 2);
 	
 
@@ -135,7 +141,9 @@ void Game::main_game(Round &loaded_round)
 	int choice = 0;
 	int round_number = 0;
 	int loop_count = 0;
-
+	
+	auto player_1 = players.at(0);
+	auto player_2 = players.at(1);
 
 
 	do {
@@ -150,6 +158,8 @@ void Game::main_game(Round &loaded_round)
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
 		round_number++;
+		player_1->clear_hand_and_meld();
+		player_2->clear_hand_and_meld();
 		
 	} while (choice != 2);
 
@@ -158,6 +168,7 @@ void Game::main_game(Round &loaded_round)
 
 	delete players.at(0);
 	delete players.at(1);
+	players.clear();
 
 }
 
@@ -201,7 +212,7 @@ int validate_option_based_input(int lower_bound, int upper_bound)
 		std::cin >> input;
 		std::cin.clear();
 		std::cin.ignore(10000000, '\n');
-		
+
 		if (std::all_of(input.begin(), input.end(), ::isdigit)) {
 			converted_option = std::stoi(input);
 

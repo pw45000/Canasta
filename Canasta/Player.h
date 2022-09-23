@@ -35,6 +35,7 @@ public:
 	void set_player_score(int score);
 	void set_meld(std::vector<std::vector<Card>> meld_container);
 	void set_hand(std::vector<Card> hand_container);
+	void clear_hand_and_meld();
 
 
 	virtual bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;

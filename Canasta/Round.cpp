@@ -52,6 +52,14 @@ void Round::main_round(bool has_loaded_file)
 			set_next_player(coin_toss());
 		}
 
+		else {
+			if (player1->get_score() > player2->get_score())
+				next_player = 1;
+			else
+				next_player = 2;
+		}
+
+
 		initial_draw();
 		sort_players_hands();
 	}

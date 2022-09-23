@@ -447,6 +447,16 @@ bool operator<(const Card card1, const Card card2)
 	int card_1_value = card1.get_numeric_value();
 	int card_2_value = card2.get_numeric_value();
 
+	int card_1_points = card1.get_point_value();
+	int card_2_points = card2.get_point_value();
+
 	
-	return card_1_value < card_2_value;
+	if (card_1_points == card_2_points) {
+		return card_1_value < card_2_value;
+	}
+	else {
+		return card_1_points < card_2_points;
+	}
+
+	
 }
