@@ -18,6 +18,7 @@ public:
 	void add_to_hand(std::vector<Card> cards_to_be_added);
 	void create_special_meld(Card card_to_be_added);
 	bool create_meld(std::vector<Card> potential_meld);
+	bool create_meld(Card first, Card second, Card third);
 	void purge_red_threes();
 	
 	bool lay_off(Card addition, int meld_number);
@@ -36,6 +37,14 @@ public:
 	void set_meld(std::vector<std::vector<Card>> meld_container);
 	void set_hand(std::vector<Card> hand_container);
 	void clear_hand_and_meld();
+
+	void print_vector(std::vector<Card> vector_to_print);
+	void print_meld(int meld_pos);
+	int get_score_from_meld(int meld_pos);
+
+	void sort_melds(std::vector<std::vector<Card>> &melds_to_sort);
+	std::vector<Card> get_wild_cards_from_vector(std::vector<Card> arbitrary_card_vect);
+	bool meld_of_card_exists(Card card_to_search);
 
 
 	virtual bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
@@ -58,3 +67,4 @@ private:
 };
 
 int validate_option_based_input(int lower_bound, int upper_bound);
+int validate_option_based_input(int lower_bound, int upper_bound, bool special_option);

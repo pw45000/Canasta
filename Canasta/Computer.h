@@ -4,6 +4,7 @@ class Player;
 
 class Computer : public Player {
 public: 
+	Computer();
 	bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) override;
 	void discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) override;
 	void meld();
@@ -14,4 +15,5 @@ public:
 	virtual std::string get_player_type() override;
 
 private:
+	int meld_cut_off;
 };

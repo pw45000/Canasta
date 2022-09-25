@@ -105,7 +105,7 @@ bool Hand::lay_off(Card addition, int meld_number)
 	//This is done by checking the first element, as all wild cards will be at the end
 	//of an initial meld. 
 	else {
-		if (addition.get_card_face() == existing_meld.at(meld_number).get_card_face()) {
+		if (addition.get_card_face() == existing_meld.at(0).get_card_face()) {
 			meld_container.at(meld_number).push_back(addition);
 			remove_from_hand(addition);
 			return true;
@@ -132,9 +132,11 @@ bool Hand::create_meld(Card first, Card second, Card third)
 		return false;
 	}
 
+	bool has_wilds = (first.isWild() || second.isWild() || third.isWild());
+
 	
 	if ((first.get_card_face() == second.get_card_face() && 
-		second.get_card_face() == third.get_card_face())) {
+		second.get_card_face() == third.get_card_face()) &&!has_wilds) {
 		card_rank = first.get_card_face();
 
 		if (is_not_duplicate_meld(card_rank)) {
@@ -233,6 +235,10 @@ bool Hand::is_meldable(Card discard_head)
 {
 	int compatible_cards = 0;
 	int wild_cards = 0;
+
+	if (discard_head.get_has_transferred())
+		return false;
+
 	if (discard_head.isSpecial()) {
 		if (discard_head.get_card_suit() == 'H' || discard_head.get_card_suit() == 'D')
 			return true;
@@ -242,9 +248,12 @@ bool Hand::is_meldable(Card discard_head)
 	else if (discard_head.isWild()) {
 		//O(n^2). vastly inefficient, looking into fixing this.
 		for (int itr = 0; itr < hand_container.size(); itr++) {
-			compatible_cards = std::count(hand_container.begin(), hand_container.end(), hand_container.at(itr));
-			if (compatible_cards >= 2) {
-				return true;
+			for (int smlr_card_pos = 0; smlr_card_pos < hand_container.size(); smlr_card_pos++) {
+				if (hand_container.at(smlr_card_pos).get_card_face() == hand_container.at(itr).get_card_face())
+					compatible_cards++;
+				if (compatible_cards >= 2) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -406,6 +415,28 @@ std::vector<Card> Hand::get_wild_cards(int meld_pos)
 	return wild_meld;
 }
 
+std::vector<Card> Hand::get_wild_cards_ignore_transfer(int meld_pos)
+{
+	std::vector<Card> extraction_meld = meld_container.at(meld_pos);
+	std::vector<Card> wild_meld;
+	for (int itr = 0; itr < extraction_meld.size(); itr++)
+		if (extraction_meld.at(itr).isWild())
+			wild_meld.push_back(extraction_meld.at(itr));
+	return wild_meld;
+}
+
+std::vector<Card> Hand::get_wild_cards_from_hand()
+{
+	std::vector<Card> wild_vector; 
+
+	for (int card_pos = 0; card_pos < hand_container.size(); card_pos++) {
+		if (hand_container.at(card_pos).isWild() && hand_container.at(card_pos).get_has_transferred() == false)
+			wild_vector.push_back(hand_container.at(card_pos));
+	}
+	return wild_vector;
+
+}
+
 std::vector<std::vector<Card>> Hand::get_meld()
 {
 	return meld_container;
@@ -462,6 +493,17 @@ std::vector<Card> Hand::get_hand_container() const
 	return hand_container;
 }
 
+int Hand::size_of_non_spec_melds() const
+{
+	int non_spec_meld_counter = 0;
+	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+		
+		if (!meld_container.at(meld_pos).at(0).isSpecial())
+		non_spec_meld_counter++;
+	}
+	return non_spec_meld_counter;
+}
+
 void Hand::set_meld(std::vector<std::vector<Card>> &meld_container)
 {
 	this-> meld_container = meld_container;
@@ -470,6 +512,26 @@ void Hand::set_meld(std::vector<std::vector<Card>> &meld_container)
 void Hand::set_hand(std::vector<Card> &hand_container)
 {
 	this->hand_container = hand_container;
+}
+
+bool Hand::meld_exits_already(Card card_to_search)
+{
+	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+		for (int card_pos = 0; card_pos < meld_container.at(meld_pos).size(); card_pos++) {
+			if (card_to_search.get_card_face() == meld_container.at(meld_pos).at(card_pos).get_card_face())
+				return true;
+		}
+	}
+	return false;
+}
+
+int Hand::get_score_from_meld(int meld_pos) const
+{
+	int score = 0;
+	for (int card_pos = 0; card_pos < meld_container.at(meld_pos).size(); card_pos++) {
+		score += meld_container.at(meld_pos).at(card_pos).get_point_value();
+	}
+	return score;
 }
 
 void Hand::sort()

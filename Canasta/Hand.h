@@ -34,6 +34,8 @@ public:
 	Card get_card_from_hand(int pos);
 	void print_all_wilds_of_meld(int meld);
 	std::vector<Card> get_wild_cards(int meld_pos);
+	std::vector<Card> get_wild_cards_ignore_transfer(int meld_pos);
+	std::vector<Card> get_wild_cards_from_hand();
 	std::vector<std::vector<Card>> get_meld();
 	Card get_card_from_meld(int meld_pos, int card_pos);
 	void clear_transfer_states();
@@ -41,11 +43,13 @@ public:
 	int get_total_score();
 	std::vector<Card> get_hand_container() const;
 
-
+	int size_of_non_spec_melds() const; 
 
 	void set_meld(std::vector<std::vector<Card>> &meld_container);
 	void set_hand(std::vector<Card> &hand_container);
+	bool meld_exits_already(Card card_to_search);
 
+	int get_score_from_meld(int meld_pos) const; 
 
 	void sort();
 

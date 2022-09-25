@@ -56,6 +56,9 @@ Card Deck::draw_from_stock()
 	//this seems to be a lot more intuitive.
 	card_drawn = *(stock_pile.begin());
 	stock_pile.erase(stock_pile.begin());
+
+
+
 	return card_drawn;
 }
 
@@ -66,11 +69,6 @@ std::vector<Card> Deck::draw_from_discard() {
 	discard_pile.clear();
 
 	Card first_discard;
-
-	do {
-		first_discard = draw_from_stock();
-		discard_push_front(first_discard);
-	} while (first_discard.is_red_three() || first_discard.isWild());
 
 	return copy_of_discard;
 }

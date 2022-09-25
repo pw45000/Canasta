@@ -44,3 +44,4 @@ private:
 //we'll need to have this as out of class function so as to avoid dependancy on the Game class
 //when we call this function in the round Class.
 int validate_option_based_input(int lower_bound, int upper_bound);
+int validate_option_based_input(int lower_bound, int upper_bound, bool special_option);

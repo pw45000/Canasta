@@ -59,8 +59,6 @@ public:
 private: 
 	Deck stock_and_discard;
 	int round_number;
-	int player_1_score;
-	int player_2_score;
 	int next_player;
 	std::vector<Player*> players;
 };

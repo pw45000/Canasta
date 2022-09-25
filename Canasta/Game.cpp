@@ -158,6 +158,7 @@ void Game::main_game(Round &loaded_round)
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
 		round_number++;
+		loop_count++;
 		player_1->clear_hand_and_meld();
 		player_2->clear_hand_and_meld();
 		
@@ -230,6 +231,39 @@ int validate_option_based_input(int lower_bound, int upper_bound)
 	} 
 	while (is_valid != true); 
 	
+	return converted_option;
+}
+int validate_option_based_input(int lower_bound, int upper_bound, bool special_option)
+{
+	std::string input;
+	bool is_valid = false;
+	int converted_option = 0;
+	do {
+
+		std::cin >> input;
+		std::cin.clear();
+		std::cin.ignore(10000000, '\n');
+
+		if (input == "-1")
+			return -1;
+
+
+		if (std::all_of(input.begin(), input.end(), ::isdigit)) {
+			converted_option = std::stoi(input);
+
+			if (converted_option >= lower_bound && converted_option <= upper_bound) {
+				is_valid = true;
+			}
+			else {
+				std::cout << "Input Error: selected number is not an option." << std::endl;
+			}
+		}
+		else {
+			std::cout << "Input Error: inputted string is not numeric." << std::endl;
+		}
+
+	} while (is_valid != true);
+
 	return converted_option;
 }
 //parts taken from past project VC8000, plug github link

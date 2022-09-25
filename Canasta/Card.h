@@ -38,6 +38,7 @@ public:
 	bool isSpecial() const; 
 	bool isNatural() const;
 	bool is_red_three() const;
+	bool is_joker() const; 
 	bool get_has_transferred() const;
 
 
@@ -56,3 +57,4 @@ private:
 //one of the only functions not added within the class. This is because we need a binary comparison.
 bool operator== (const Card card1, const Card card2);
 bool operator< (const Card card1, const Card card2);
+bool operator> (const Card card1, const Card card2);

@@ -76,7 +76,7 @@ bool Human::draw(Deck &draw_decks)
 				}
 			}
 		}
-	} while (!(draw_decks.both_piles_are_empty()) && !(has_completed_draw) ||
+	} while (!(draw_decks.both_piles_are_empty()) && !(has_completed_draw) &&
 		(!draw_decks.stock_is_empty() && !draw_decks.get_discard_is_frozen() && !(has_completed_draw))
 		);
 
@@ -181,7 +181,7 @@ void Human::meld()
 					wild_pos = validate_option_based_input(0, player_hand.get_size_of_meld()) - 1;
 
 					//this is if the user enters 0.
-					if (meld_pos == -1) break;
+					if (wild_pos == -1) break;
 
 
 					std::vector<Card> wild_meld = player_hand.get_wild_cards(wild_pos);
@@ -204,11 +204,10 @@ void Human::meld()
 
 					std::cout << "Great, now pick a meld position from 1 to " << player_hand.get_size_of_meld()
 						<< " to add onto. Enter 0 cancel the operation." << std::endl;
-					std::cout << "Also, input"; 
-					player_hand.get_size_of_meld(); 
-					std::cout<<" if you want to transfer the wild card back to the hand.You can only do this" <<
+					std::cout << "Also, input -1";
+					std::cout<<" if you want to transfer the wild card back to the hand. You can only do this " <<
 						"if you can create a meld with the cards in the hand." << std::endl;
-					meld_pos = validate_option_based_input(-1, player_hand.get_size_of_meld());
+					meld_pos = validate_option_based_input(-1, player_hand.get_size_of_meld(), true)-1;
 
 
 
@@ -250,6 +249,9 @@ void Human::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds
 	Hand player_hand = get_player_hand();
 	int size_of_hand = player_hand.get_size_of_hand();
 
+	if (size_of_hand == 0) {
+		std::cout << "You don't have anything to discard, so you skip your discard turn." << std::endl;
+	}
 
 
 	std::cout << "DISCARD Phase: What card would you like to discard? Select a position from 1 to " 

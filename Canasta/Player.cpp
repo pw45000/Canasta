@@ -51,6 +51,11 @@ bool Player::create_meld(std::vector<Card> potential_meld)
 
 }
 
+bool Player::create_meld(Card first, Card second, Card third)
+{
+	return player_hand.create_meld(first, second, third);
+}
+
 void Player::purge_red_threes()
 {
 	player_hand.purge_red_threes();
@@ -141,6 +146,54 @@ void Player::clear_hand_and_meld()
 {
 	player_hand.clear_all_data();
 }
+
+void Player::print_vector(std::vector<Card> vector_to_print)
+{
+	std::cout << "[ ";
+		for (Card card : vector_to_print) {
+			std::cout << card.get_card_string() << " ";
+	}
+	std::cout << "] " << std::endl;
+}
+
+void Player::print_meld(int meld_pos)
+{
+	Hand player_hand = get_player_hand();
+	std::vector<std::vector<Card>> meld_container = player_hand.get_meld();
+	print_vector(meld_container.at(meld_pos));
+}
+
+int Player::get_score_from_meld(int meld_pos)
+{
+	return 0;
+}
+
+void Player::sort_melds(std::vector<std::vector<Card>> &melds_to_sort)
+{
+	int first_card_pos = 0;
+	std::sort(melds_to_sort.begin(), melds_to_sort.end(),
+		[first_card_pos](const std::vector<Card>& lhs, const std::vector<Card>& rhs) {
+			return lhs.size() < rhs.size();
+		});
+}
+
+std::vector<Card> Player::get_wild_cards_from_vector(std::vector<Card> arbitrary_card_vect)
+{
+	std::vector<Card> vector_of_wild_cards; 
+	for (int card_pos = 0; card_pos < arbitrary_card_vect.size(); card_pos++) {
+		if (arbitrary_card_vect.at(card_pos).isWild() && arbitrary_card_vect.at(card_pos).get_has_transferred() == false) {
+			vector_of_wild_cards.push_back(arbitrary_card_vect.at(card_pos));
+		}
+	}
+	return vector_of_wild_cards;
+}
+
+bool Player::meld_of_card_exists(Card card_to_search)
+{
+	return player_hand.meld_exits_already(card_to_search);
+}
+
+
 
 void Player::meld() {
 	return;

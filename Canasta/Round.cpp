@@ -612,8 +612,7 @@ void Round::save_round()
 
 Round::Round()
 {
-	player_1_score = 0;
-	player_2_score = 0;
+
 	next_player = 0;
 	round_number = 0;
 }
@@ -622,8 +621,6 @@ Round::Round(Human player1, Human player2)
 {
 	players.push_back(&player1);
 	players.push_back(&player2);
-	player_1_score = 0;
-	player_2_score = 0;
 	next_player = 0;
 	round_number = 0;
 }
@@ -632,8 +629,6 @@ Round::Round(Human player1, Computer player2)
 {
 	players.push_back(&player1);
 	players.push_back(&player2);
-	player_1_score = 0;
-	player_2_score = 0;
 	next_player = 0;
 	round_number = 0;
 }
@@ -642,8 +637,6 @@ Round::Round(std::vector<Player*> players, int round_number)
 {
 	this->players = players;
 	this->round_number = round_number;
-	player_1_score = 0;
-	player_2_score = 0;
 	next_player = 0;
 }
 
@@ -653,8 +646,6 @@ Round::Round(const Round& other_round)
 {
 	this->next_player = other_round.next_player;
 	this->stock_and_discard = other_round.stock_and_discard;
-	this->player_1_score = other_round.player_1_score;
-	this->player_2_score = other_round.player_2_score;
 	this->players = other_round.players;
 
 }
