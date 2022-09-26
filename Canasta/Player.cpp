@@ -79,6 +79,7 @@ void Player::sort_hand()
 void Player::temp_print_hand()
 {
 	std::cout << std::endl;
+	std::cout << "Your Hand & Melds Information: " << std::endl;
 	std::cout << "Hand: "; get_player_hand().print_hand();
 	std::cout << "      ";
 	for (int i = 0; i < get_player_hand().get_size_of_hand(); i++) {
@@ -173,7 +174,7 @@ void Player::sort_melds(std::vector<std::vector<Card>> &melds_to_sort)
 	int first_card_pos = 0;
 	std::sort(melds_to_sort.begin(), melds_to_sort.end(),
 		[first_card_pos](const std::vector<Card>& lhs, const std::vector<Card>& rhs) {
-			return lhs.size() < rhs.size();
+			return lhs.size() > rhs.size();
 		});
 }
 
@@ -191,6 +192,20 @@ std::vector<Card> Player::get_wild_cards_from_vector(std::vector<Card> arbitrary
 bool Player::meld_of_card_exists(Card card_to_search)
 {
 	return player_hand.meld_exits_already(card_to_search);
+}
+
+int Player::get_absolute_pos_from_relative_meld(std::vector<Card> arbitrary_meld_vect)
+{
+	int first_element = 0; 
+	int error_pos = -999;
+	Hand player_hand = get_player_hand();
+	std::vector<std::vector<Card>> meld_container = player_hand.get_meld();
+	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+		if (arbitrary_meld_vect.at(first_element) == meld_container.at(meld_pos).at(first_element))
+			return meld_pos;
+	}
+	return -error_pos;
+
 }
 
 

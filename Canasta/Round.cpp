@@ -207,11 +207,14 @@ void Round::sort_players_hands()
 
 int Round::pre_turn_menu()
 {
+	int next_player = get_next_player()-1;
 	std::cout << "1. Save the game" << std::endl;
 	std::cout << "2. Take the turn" << std::endl;
 	std::cout << "3. Advice (ask for help)" << std::endl;
 	std::cout << "4. Quit the game" << std::endl;
 	return validate_option_based_input(1, 4);
+	
+	
 }
 
 void Round::tally_score()

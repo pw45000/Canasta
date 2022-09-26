@@ -31,6 +31,7 @@ public:
 	void discard_push_front(Card pushed_card);
 	void set_discard_freeze(bool is_frozen);
 	void clear_discard();
+	int get_size_of_discard() const; 
 
 
 	void print_top_of_stock();

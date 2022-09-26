@@ -231,6 +231,43 @@ bool Hand::create_meld(Card red_three)
 	}
 
 }
+
+bool Hand::is_meldable_with_melds(Card discard_head) {
+	bool can_meld = false;
+	
+
+	if (discard_head.isSpecial()) {
+		if (discard_head.get_card_suit() == 'H' || discard_head.get_card_suit() == 'D')
+			return true;
+		else
+			return false;
+	}
+	
+	
+	
+	else if (discard_head.isWild()) {
+		for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+			if (!meld_container.at(meld_pos).at(0).isSpecial() && get_wild_cards(meld_pos).size() < 3)
+				return true;
+		}
+	}
+
+	else if (discard_head.isNatural()) {
+		for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++)
+			if (discard_head.get_card_face() == meld_container.at(meld_pos).at(0).get_card_face())
+				return true;
+	}
+
+	return false;
+
+
+}
+
+
+
+
+
+
 bool Hand::is_meldable(Card discard_head)
 {
 	int compatible_cards = 0;

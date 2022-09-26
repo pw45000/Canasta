@@ -45,6 +45,8 @@ public:
 	void sort_melds(std::vector<std::vector<Card>> &melds_to_sort);
 	std::vector<Card> get_wild_cards_from_vector(std::vector<Card> arbitrary_card_vect);
 	bool meld_of_card_exists(Card card_to_search);
+	
+	int get_absolute_pos_from_relative_meld(std::vector<Card> arbitrary_meld_vect);
 
 
 	virtual bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
@@ -55,6 +57,7 @@ public:
 	virtual void print_player_type() = 0;
 	virtual bool choose_to_go_out() = 0;
 	virtual std::string get_player_type() = 0;
+	virtual void strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	
 	
 	

@@ -37,6 +37,7 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 	Hand player_hand = get_player_hand();
 	std::vector<Card> hand_container = player_hand.get_hand_container();
 	Card preferred_card;
+	int first_card_pos = 0;
 	
 	auto three_spades_itr = std::find(hand_container.begin(), hand_container.end(), Card("3S"));
 	auto three_clubs_itr = std::find(hand_container.begin(), hand_container.end(), Card("3C"));
@@ -46,7 +47,7 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 		for (int meld_pos = 0; meld_pos < enemy_melds.size(); meld_pos++) {
 			//checks for the first card. Due to the way I set up melding, it'll never
 			//be able to have a wild card be the first card in a meld.
-			if (card_to_search != enemy_melds.at(meld_pos).at(0) && !card_to_search.isWild())
+			if (card_to_search.get_card_face() != enemy_melds.at(meld_pos).at(0).get_card_face() && !card_to_search.isWild())
 				preference_discard.push_back(card_to_search);
 		}
 
@@ -57,31 +58,45 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 
 	}
 
-	if (three_spades_itr != hand_container.end()) {
-		preferred_card = *three_spades_itr;
-		draw_decks.discard_push_front(*three_spades_itr);
-		remove_from_hand(*three_spades_itr);
-		std::cout << "The CPU chose to get rid of a three of spades since it can't make melds with it." << std::endl;
-		return;
+	Card top_of_discard = draw_decks.get_top_discard_pile();
+	bool has_discarded_three = false;
+	for (int meld_pos = 0; meld_pos < enemy_melds.size(); meld_pos++) {
+		if (top_of_discard == enemy_melds.at(meld_pos).at(first_card_pos)) {
+			if (three_spades_itr != hand_container.end()) {
+				preferred_card = *three_spades_itr;
+				draw_decks.discard_push_front(*three_spades_itr);
+				remove_from_hand(*three_spades_itr);
+				std::cout << "The CPU chose to get rid of three of spades since it sees the top of the discard, "
+					<< top_of_discard.get_card_string() << " is in the meld: "; print_meld(meld_pos);
+				std::cout << std::endl;
+				has_discarded_three = true;
+				break;
+			}
+
+
+			else if (three_clubs_itr != hand_container.end()) {
+				preferred_card = *three_clubs_itr;
+				draw_decks.discard_push_front(*three_clubs_itr);
+				remove_from_hand(*three_clubs_itr);
+				std::cout << "The CPU chose to get rid of three of clubs since it sees the top of the discard, "
+					<< top_of_discard.get_card_string() << " is in the meld: "; print_meld(meld_pos);
+					std::cout<< std::endl;
+					has_discarded_three = true;
+				break;
+			}
+		}
 	}
 
 
-	else if (three_clubs_itr != hand_container.end()) {
-		preferred_card = *three_clubs_itr;
-		draw_decks.discard_push_front(*three_clubs_itr);
-		remove_from_hand(*three_clubs_itr);
-		std::cout << "The CPU chose to get rid of a three of clubs since it can't make melds with it." << std::endl;
-		return;
-	}
 
-	else if (preference_discard.size() != 0) {
+	if (preference_discard.size() != 0 && !has_discarded_three) {
 		preferred_card = preference_discard.at(0);
 		
 		std::cout << "The CPU chose to get rid of " << preferred_card.get_card_string() << " since it the lowest value  " <<
 		"In the CPU's hand, @" << preferred_card.get_point_value() << " points, and is not in any of the enemy's melds." << std::endl;
 	}
 
-	else if (no_wild_discard.size()!= 0) {
+	else if (no_wild_discard.size()!= 0 && !has_discarded_three) {
 		preferred_card = no_wild_discard.at(0);
 
 		std::cout << "The CPU chose to get rid of " << preferred_card.get_card_string() << " since it the lowest value  " <<
@@ -90,13 +105,11 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 		//https://stackoverflow.com/questions/44576857/randomly-pick-from-a-vector-in-c
 
 	}
-	else if (hand_container.size()!=0) {
-		static thread_local std::mt19937 g{ std::random_device{}() };
-		static thread_local std::uniform_int_distribution<size_t> d{ 0,hand_container.size() };
-		preferred_card = hand_container.at(d(g));
-		std::cout << "The CPU had no choice, so it randomly chose a card, which ended up being: " << preferred_card.get_card_string() << std::endl;
+	else if (hand_container.size()!=0 && !has_discarded_three) {
+		preferred_card = hand_container.at(0);
+		std::cout << "The CPU had no choice, so it got rid of it's lowest value card, which ended up being: " << preferred_card.get_card_string() << std::endl;
 	}
-	else {
+	else if (!has_discarded_three) {
 		std::cout << "The CPU has nothing to discard, so it didn't." << std::endl;
 		return;
 	}
@@ -134,6 +147,7 @@ void Computer::meld()
 	//https://stackoverflow.com/questions/52150939/cant-dereference-value-initialized-iterator
 	//first, remove the duplicate cards.
 
+	bool has_done_action = false;
 
 	
 
@@ -153,6 +167,7 @@ void Computer::meld()
 						print_meld(wild_pos);
 						std::cout << "since it is quite eager to get rid of the cards out of it's hand to go out." << std::endl;
 						transfer_card(wild_transfer_meld.at(wild_pos), meld_pos, -2);
+						has_done_action = true;
 					}
 				}
 			}
@@ -195,9 +210,15 @@ void Computer::meld()
 			}
 		}
 
+		bool meld_already_exists = false;
 
-		bool meld_already_exists = meld_of_card_exists(natural_meld_vector.at(0));
+		if (natural_meld_vector.size() > 0) {
+			bool meld_already_exists = meld_of_card_exists(natural_meld_vector.at(0));
+		}
 
+		else {
+			meld_already_exists = false;
+		}
 
 		if (natural_meld_vector.size() >= 3 && !meld_already_exists) {
 			Card first_card = natural_meld_vector.at(0);
@@ -209,6 +230,7 @@ void Computer::meld()
 
 			for (int lay_off_pos = 3; lay_off_pos < natural_meld_vector.size(); lay_off_pos++) {
 				lay_off(natural_meld_vector.at(lay_off_pos), player_hand.get_size_of_meld() - 1);
+				has_done_action = true;
 			}
 			std::cout << "The CPU decided to meld the following cards: ";
 			print_vector(natural_meld_vector);
@@ -228,6 +250,7 @@ void Computer::meld()
 			meld_container = player_hand.get_meld();
 			for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
 				if (natural_meld_vector.at(0) == meld_container.at(meld_pos).at(0)) {
+					has_done_action = true;
 					lay_off(natural_meld_vector.at(0), meld_pos);
 					std::cout << "The computer decided to lay off card " << natural_meld_vector.at(0).get_card_string() << " as natural cards"
 						<< "only have use in natural melds." << std::endl;
@@ -239,6 +262,7 @@ void Computer::meld()
 			for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
 				if (natural_meld_vector.at(0).get_card_face()==meld_container.at(meld_pos).at(0).get_card_face())
 					for (int lay_off_pos = 0; lay_off_pos < natural_meld_vector.size(); lay_off_pos++) {
+						has_done_action = true;
 						lay_off(natural_meld_vector.at(lay_off_pos), meld_pos);
 
 						std::cout << "The CPU decided to lay off the following cards: ";
@@ -270,6 +294,7 @@ void Computer::meld()
 		std::cout << " as the two natural cards(ordered in highest order of points) can meld with a wild card. " << std::endl;
 
 		create_meld(first_nat_card, second_nat_card, third_wild_card);
+		has_done_action = true;
 		//delete the pair at the beginning of the vector
 		can_meld_with_wild.erase(can_meld_with_wild.begin()+ card_pos);
 		can_meld_with_wild.erase(can_meld_with_wild.begin() + card_pos);
@@ -288,15 +313,18 @@ void Computer::meld()
 		player_hand = get_player_hand();
 		wild_cards_in_hand = player_hand.get_wild_cards_from_hand();
 		meld_container = player_hand.get_meld();
+		sort_melds(meld_container);
 		std::vector<Card> wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(meld_pos);
 		
 		if (meld_container.at(meld_pos).size() >= 3 && wild_cards_from_meld.size()<=3) {
 
 			while (wild_cards_in_hand.size() != 0 && wild_cards_from_meld.size() < 3) {
 
-				lay_off(wild_cards_in_hand.at(0), meld_pos);
-				std::cout << "The CPU chose to lay off the card" << wild_cards_in_hand.at(0).get_card_string() <<
-					" because the meld it was in, ";
+				int absolute_meld_pos = get_absolute_pos_from_relative_meld(meld_container.at(meld_pos));
+				has_done_action = true;
+				lay_off(wild_cards_in_hand.at(0), absolute_meld_pos);
+				std::cout << "The CPU chose to lay off the card " << wild_cards_in_hand.at(0).get_card_string() <<
+					" because the meld chose, ";
 				print_vector(meld_container.at(meld_pos));
 				std::cout << " had the highest size and less than 3 wild cards, so it prioritized it." << std::endl;
 
@@ -328,6 +356,7 @@ void Computer::meld()
 				if (meld_to_extract_wilds.size() < 3) {
 					std::vector<Card> wild_to_transfer = player_hand.get_wild_cards(other_melds_pos);
 					while (wild_to_transfer.size() != 0) {
+						has_done_action = true;
 						transfer_card(wild_to_transfer.at(0), other_melds_pos, meld_pos);
 						std::cout << "CPU decided to transfer card " << wild_to_transfer.at(0).get_card_string() <<
 							"from meld: ";  print_meld(other_melds_pos); std::cout << std::endl;
@@ -348,6 +377,9 @@ void Computer::meld()
 		}
 	}
 
+	if (!has_done_action) {
+		std::cout << "The CPU decided to do nothing, since it can't do any actions regarding melding." << std::endl;
+	}
 	
 
 
@@ -365,9 +397,10 @@ bool Computer::draw(Deck &draw_decks)
 	Hand player_hand = get_player_hand();
 	Card top_of_discard = draw_decks.get_top_discard_pile();
 	bool can_meld = player_hand.is_meldable(top_of_discard);
+	bool can_meld_with_melds = player_hand.is_meldable_with_melds(top_of_discard);
 
-	if ((player_hand.get_size_of_hand() > 5 && can_meld && !has_canasta()) && (!draw_decks.get_discard_is_frozen())) {
-		std::cout << "CPU: drawing discard pile: can meld with hand, hand isn't that small." << std::endl;
+	if ((player_hand.get_size_of_hand() > 5 && (can_meld || can_meld_with_melds) && !has_canasta()) && (!draw_decks.get_discard_is_frozen())) {
+		std::cout << "CPU: drawing discard pile: can meld with hand or add onto melds, hand isn't that small." << std::endl;
 		std::vector<Card> picked_up_discard = draw_decks.draw_from_discard();
 		add_to_hand(picked_up_discard);
 		purge_red_threes();
@@ -382,7 +415,7 @@ bool Computer::draw(Deck &draw_decks)
 			drawn_card = draw_decks.draw_from_stock();
 			add_to_hand(drawn_card);
 			purge_red_threes();
-		} while (drawn_card.is_red_three());
+		} while (drawn_card.is_red_three() && !draw_decks.stock_is_empty());
 		
 
 		if (draw_decks.get_discard_is_frozen())
@@ -412,6 +445,11 @@ bool Computer::choose_to_go_out()
 {
 	std::cout << "The computer chose to go out since it likes 100 point bonuses." << std::endl;
 	return true;
+}
+
+void Computer::strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds)
+{
+	std::cout << "The computer has it's own strategy, so it doesn't need advice..." << std::endl;
 }
 
 std::string Computer::get_player_type()

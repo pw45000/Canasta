@@ -107,12 +107,19 @@ bool Deck::both_piles_are_empty()
 
 bool Deck::get_discard_is_frozen()
 {
-	return discard_is_frozen;
+	if (discard_pile.size() != 0) {
+		return discard_is_frozen || get_top_discard_pile().isSpecial();
+	}
+	else
+		return discard_is_frozen;
 }
 
 Card Deck::get_top_discard_pile()
 {
-	return *discard_pile.begin();
+	if (discard_pile.size() != 0)
+		return *discard_pile.begin();
+	else
+		return Card();
 }
 
 void Deck::print_stock_pile()
@@ -153,6 +160,11 @@ void Deck::set_discard_freeze(bool is_frozen)
 void Deck::clear_discard()
 {
 	discard_pile.clear();
+}
+
+int Deck::get_size_of_discard() const
+{
+	return discard_pile.size();
 }
 
 void Deck::print_top_of_stock()

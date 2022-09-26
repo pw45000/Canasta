@@ -15,6 +15,7 @@ public:
 	Hand(std::vector<Card> debug_hand);
 	bool create_meld(Card first, Card second, Card third);
 	bool create_meld(Card red_three);
+	bool is_meldable_with_melds(Card discard_head);
 	bool is_meldable(Card discard_head);
 	bool transfer_wild_card(Card transfer, int wild_origin, int meld_number);
 	bool lay_off(Card addition, int meld_number);
