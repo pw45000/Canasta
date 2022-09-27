@@ -52,21 +52,25 @@ public:
 	virtual bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	//virtual void strategy();
 	virtual bool draw(Deck &draw_decks) = 0;
-	virtual void meld();
+	virtual void meld(std::vector<std::vector<Card>> enemy_melds) = 0;
 	virtual void discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	virtual void print_player_type() = 0;
 	virtual bool choose_to_go_out() = 0;
 	virtual std::string get_player_type() = 0;
 	virtual void strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	
-	
+	bool get_go_out_decision() const; 
+	void set_go_out_decision(bool go_out_decision); 
 	
 	bool go_out();
 
+	int get_dangerous_amount_of_cards(std::vector<std::vector<Card>> enemy_melds);
+	bool is_dangerous_card(Card potential_danger_card, std::vector<std::vector<Card>> enemy_melds);
 
 private:
 	int score;
 	Hand player_hand;
+	bool has_decided_to_go_out;
 };
 
 int validate_option_based_input(int lower_bound, int upper_bound);

@@ -9,7 +9,7 @@ class Human : public Player {
 public: 
 	bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) override ;
 	bool draw(Deck &draw_decks) override;
-	void meld() override;
+	void meld(std::vector<std::vector<Card>> enemy_melds) override;
 	void discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) override;
 	void print_player_type() override;
 	bool choose_to_go_out() override;

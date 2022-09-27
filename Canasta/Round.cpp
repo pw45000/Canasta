@@ -6,29 +6,20 @@ int Round::coin_toss()
 	std::random_device dev;
 	std::uniform_int_distribution<std::mt19937::result_type> coin(1, 2);
 
-	std::string choice;
 	auto flipped_coin = coin(dev);
 	std::cout << "Player 2! Heads or Tails?" << std::endl;
 	std::cout << "1. Heads" << std::endl;
 	std::cout << "2. Tails" << std::endl;
-	do {
-		std::cin >> choice;
-		std::cin.clear();
-		std::cin.ignore(500, '\n');
-		if (choice != "1" && choice != "2")
-			std::cout << "That's not a right option, pick 1 or 2..." << std::endl;
-		
-	}
-	while (choice!="1" && choice!="2");
+	int choice = validate_option_based_input(1, 2);
 
 
-	if (std::stoi(choice) == flipped_coin) {
-		std::cout << "Player 1 goes first! They guessed correctly, the value is " << flipped_coin << std::endl;
+	if (choice == flipped_coin) {
+		std::cout << "Player 1 goes first! They guessed correctly, the value is " << ((flipped_coin==1) ? "Heads" : "Tails") << std::endl;
 		return 2;
 	}
 
 	else {
-		std::cout << "Player 2 goes first! Player 1 guessed incorrectly the value is "<< flipped_coin << std::endl;
+		std::cout << "Player 2 goes first! Player 1 guessed incorrectly the value is "<< ((flipped_coin == 1) ? "Heads" : "Tails") << std::endl;
 		return 1; 
 	}
 
@@ -38,7 +29,7 @@ int Round::coin_toss()
 
 }
 
-void Round::main_round(bool has_loaded_file)
+bool Round::main_round(bool has_loaded_file)
 {
 	auto player1 = players.at(0);
 	auto player2 = players.at(1);
@@ -70,22 +61,37 @@ void Round::main_round(bool has_loaded_file)
 			menu_choice = pre_turn_menu();
 
 			switch (menu_choice) {
-			case 1:
+			case 1: {
+				std::cout << "How would you like to save?" << std::endl;
+				std::cout << "1. save and continue" << std::endl;
+				std::cout << "2. save and quit" << std::endl;
+				int save_choice = validate_option_based_input(1, 2);
 				sort_players_hands();
 				save_round();
+				if (save_choice == 2)
+					return true;
 				break;
+			}
 			case 2:
 				continue;
 				break;
 			case 3:
-				continue;
+				return true;
 				break;
-			case 4:
-				round_is_over = true;
+			case 4: {
+				auto player_to_give_advice_pos = get_next_player() - 1;
+				auto player_to_give_advice = players.at(player_to_give_advice_pos);
+				auto enemy_player = (player_to_give_advice == 0) ? players.at(1) : players.at(0);
+				Hand enemy_hand = enemy_player->get_player_hand();
+				std::vector<std::vector<Card>> enemy_meld = enemy_hand.get_meld();
+				
+				player_to_give_advice->strategy(stock_and_discard, enemy_meld);
+
 				break;
 			}
-
-		} while (menu_choice != 4 && menu_choice != 2);
+			}
+			//break if the option is to quit the game or to take the turn.
+		} while (menu_choice != 3 && menu_choice != 2);
 		output_round_info();
 
 		if (round_is_over == true) break;
@@ -120,6 +126,7 @@ void Round::main_round(bool has_loaded_file)
 	tally_score();
 	output_round_info();
 	
+	return false;
 
 }
 
@@ -128,18 +135,18 @@ void Round::initial_draw()
 {
 	//for each player, draw 15 cards from the stockpile.
 	int initial_draw_count = 15;
-	for (int itr = 0; itr < players.size(); itr++) {
+	for (int card_count = 0; card_count < players.size(); card_count++) {
 		for (int card = 0; card < initial_draw_count; card++) {
 			Card drawn_card = stock_and_discard.draw_from_stock();
 			std::string drawn_string = drawn_card.get_card_string();
 
 			if (drawn_string == "3H" || drawn_string == "3D") {
-				std::cout << "Lucky you! Player " << itr + 1 << ", you got a red three!" << std::endl;
-				players.at(itr)->create_special_meld(drawn_card);
+				std::cout << "Lucky you! Player " << card_count + 1 << ", you got a red three on the initial draw!" << std::endl;
+				players.at(card_count)->create_special_meld(drawn_card);
 				card--;
 			}
 			else {
-				players.at(itr)->add_to_hand(drawn_card);
+				players.at(card_count)->add_to_hand(drawn_card);
 			}
 		}
 	}
@@ -201,26 +208,54 @@ void Round::output_round_info()
 
 void Round::sort_players_hands()
 {
-	for (int itr = 0; itr < players.size(); itr++)
-		players.at(itr)->sort_hand();
+	for (int plr_pos = 0; plr_pos < players.size(); plr_pos++)
+		players.at(plr_pos)->sort_hand();
 }
 
 int Round::pre_turn_menu()
 {
 	int next_player = get_next_player()-1;
-	std::cout << "1. Save the game" << std::endl;
-	std::cout << "2. Take the turn" << std::endl;
-	std::cout << "3. Advice (ask for help)" << std::endl;
-	std::cout << "4. Quit the game" << std::endl;
-	return validate_option_based_input(1, 4);
-	
+	std::string next_player_type = players.at(next_player)->get_player_type();
+
+	if (next_player_type == "Human") {
+
+		std::cout << "1. Save the game" << std::endl;
+		std::cout << "2. Take the turn" << std::endl;
+		std::cout << "3. Quit the game" << std::endl;
+		std::cout << "4. Advice (ask for help)" << std::endl;
+		return validate_option_based_input(1, 4);
+	}
+
+	else if (next_player_type == "Computer") {
+		std::cout << "1. Save the game" << std::endl;
+		std::cout << "2. Take the turn" << std::endl;
+		std::cout << "3. Quit the game" << std::endl;
+		return validate_option_based_input(1, 4);
+	}
+	else {
+		std::cout << "Unknown Player type! Can't display pre turn menu!" << std::endl;
+		return -999;
+	}
 	
 }
 
 void Round::tally_score()
-{
+{	
 	int player_1_score = players.at(0)->get_player_hand().get_total_score();
 	int player_2_score = players.at(1)->get_player_hand().get_total_score();
+
+	if (players.at(0)->get_go_out_decision() == true) {
+		player_1_score += 100;
+	}
+	else if (players.at(1)->get_go_out_decision() == true) {
+		player_2_score += 100;
+	}
+	
+
+
+	std::cout << "Player 1 (" << players.at(0)->get_player_type()<<") "<< " round score: " << player_1_score << std::endl;
+	std::cout << "Player 2 (" << players.at(1)->get_player_type() << ") " << " round score: " << player_2_score << std::endl;
+
 
 	players.at(0)->add_to_score(player_1_score);
 	players.at(1)->add_to_score(player_2_score);
@@ -240,8 +275,13 @@ std::vector<Player*> Round::get_players()
 
 bool Round::load_game()
 {
-	std::cout << "Please enter the file you wish to load. " << std::endl;
+	std::cout << "Please enter the file you wish to load. Say 0 to quit." << std::endl;
 	std::string input_file_name;
+	if (input_file_name == "0") {
+		return false;
+	}
+
+
 	getline(std::cin, input_file_name);
 	std::ifstream file_to_load(input_file_name);
 	std::string extracted_string;

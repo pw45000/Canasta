@@ -112,21 +112,23 @@ void Game::main_game()
 	int round_number = 0;
 	auto player_1 = players.at(0);
 	auto player_2 = players.at(1);
+	bool has_quit = false;
 
 	do {
 		round_number++;
 		Round game_round(players, round_number);
-		game_round.main_round(false);
+		has_quit = game_round.main_round(false);
+		if (has_quit) break;
 		std::cout << "Would you like to another round?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl;
 		choice = validate_option_based_input(1, 2);
 		player_1->clear_hand_and_meld();
 		player_2->clear_hand_and_meld();
-	} while (choice != 2);
+	} while (choice != 2 && has_quit == false);
 	
-
-	decide_winner();
+	if(!has_quit)
+		decide_winner();
 
 	delete players.at(0);
 	delete players.at(1);
@@ -144,15 +146,17 @@ void Game::main_game(Round &loaded_round)
 	
 	auto player_1 = players.at(0);
 	auto player_2 = players.at(1);
-
+	bool has_quit = false;
 
 	do {
 		if (loop_count == 0)
-			loaded_round.main_round(true);
+			has_quit = loaded_round.main_round(true);
 		else {
 			Round game_round(players, round_number);
-			game_round.main_round(false);
+			has_quit = game_round.main_round(false);
 		}
+		if (has_quit) break;
+		
 		std::cout << "Would you like to another round?" << std::endl;
 		std::cout << "1. Yes" << std::endl;
 		std::cout << "2. No" << std::endl;
@@ -162,10 +166,10 @@ void Game::main_game(Round &loaded_round)
 		player_1->clear_hand_and_meld();
 		player_2->clear_hand_and_meld();
 		
-	} while (choice != 2);
+	} while (choice != 2 && has_quit == false);
 
-
-	decide_winner();
+	if (!has_quit)
+		decide_winner();
 
 	delete players.at(0);
 	delete players.at(1);
@@ -197,8 +201,8 @@ void Game::decide_winner()
 	}
 
 	else {
-		std::cout << "Victory for life: Player 2 (" << player_2->get_player_type() << ") with a score of" << player_2_score << std::endl;
-		std::cout << "Dejected Loser: Player 1 (" << player_1->get_player_type() << ") with a score of" << player_1_score << std::endl;
+		std::cout << "Victory for life: Player 2 (" << player_2->get_player_type() << ") with a score of " << player_2_score << std::endl;
+		std::cout << "Dejected Loser: Player 1 (" << player_1->get_player_type() << ") with a score of " << player_1_score << std::endl;
 	}
 
 }

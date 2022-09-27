@@ -10,6 +10,7 @@ Player::Player()
 {
 	score = 0;
 	player_hand;
+	has_decided_to_go_out = false;
 }
 
 int Player::get_score()
@@ -210,10 +211,16 @@ int Player::get_absolute_pos_from_relative_meld(std::vector<Card> arbitrary_meld
 
 
 
-void Player::meld() {
-	return;
+
+bool Player::get_go_out_decision() const
+{
+	return has_decided_to_go_out;
 }
 
+void Player::set_go_out_decision(bool go_out_decision)
+{
+	has_decided_to_go_out = go_out_decision;
+}
 
 bool Player::go_out()
 {
@@ -223,10 +230,38 @@ bool Player::go_out()
 		did_chose_to_go_out = choose_to_go_out();
 
 		if (did_chose_to_go_out) {
-			add_to_score(100);
+			set_go_out_decision(true);
 		}
 	}
 	return did_chose_to_go_out;
 }
+
+int Player::get_dangerous_amount_of_cards(std::vector<std::vector<Card>> enemy_melds)
+{
+	Hand player_hand = get_player_hand();
+	int amount_of_dangerous_cards = 0;
+	std::vector<Card> hand_container = player_hand.get_hand_container();
+	for (int card_pos = 0; card_pos < hand_container.size(); card_pos++) {
+		for (int meld_pos = 0; meld_pos < enemy_melds.size(); meld_pos++) {
+			if (hand_container.at(card_pos).get_card_face() == 
+			enemy_melds.at(meld_pos).at(0).get_card_face()
+			&&enemy_melds.at(meld_pos).size()==6) {
+				amount_of_dangerous_cards++;
+			}
+		}
+	}
+	return amount_of_dangerous_cards;
+}
+
+bool Player::is_dangerous_card(Card potential_danger_card, std::vector<std::vector<Card>> enemy_melds)
+{
+	for (int meld_pos = 0; meld_pos < enemy_melds.size(); meld_pos++) {
+		if (potential_danger_card.get_card_face() == enemy_melds.at(meld_pos).at(0).get_card_face())
+			return true;
+	}
+	return false;
+}
+
+
 
 

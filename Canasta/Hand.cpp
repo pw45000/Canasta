@@ -86,8 +86,8 @@ bool Hand::lay_off(Card addition, int meld_number)
 		int wild_counter = 0;
 		//count the amount of wild cards there is, since 
 		//there cannot be more than 3. 
-		for (int itr = 0; itr < existing_meld.size(); itr++)
-			if (existing_meld.at(itr).isWild())
+		for (int card_pos = 0; card_pos < existing_meld.size(); card_pos++)
+			if (existing_meld.at(card_pos).isWild())
 				wild_counter++;
 		//However, do check how many wild cards there are. 
 		if (wild_counter < 3) { 
@@ -141,8 +141,8 @@ bool Hand::create_meld(Card first, Card second, Card third)
 
 		if (is_not_duplicate_meld(card_rank)) {
 			meld_container.push_back(potential_meld);
-			for (int itr = 0; itr < 3; itr++) {
-				remove_from_hand(potential_meld.at(itr));
+			for (int card_pos = 0; card_pos < 3; card_pos++) {
+				remove_from_hand(potential_meld.at(card_pos));
 			}
 			return true;
 		}
@@ -192,8 +192,8 @@ bool Hand::create_meld(Card first, Card second, Card third)
 				wild_Card.set_has_transferred(true);
 				potential_meld.push_back(wild_Card);
 				meld_container.push_back(potential_meld);
-				for (int itr = 0; itr < 3; itr++) {
-					remove_from_hand(potential_meld.at(itr));
+				for (int card_pos = 0; card_pos < 3; card_pos++) {
+					remove_from_hand(potential_meld.at(card_pos));
 				}
 
 
@@ -284,9 +284,9 @@ bool Hand::is_meldable(Card discard_head)
 	}
 	else if (discard_head.isWild()) {
 		//O(n^2). vastly inefficient, looking into fixing this.
-		for (int itr = 0; itr < hand_container.size(); itr++) {
+		for (int card_pos = 0; card_pos < hand_container.size(); card_pos++) {
 			for (int smlr_card_pos = 0; smlr_card_pos < hand_container.size(); smlr_card_pos++) {
-				if (hand_container.at(smlr_card_pos).get_card_face() == hand_container.at(itr).get_card_face())
+				if (hand_container.at(smlr_card_pos).get_card_face() == hand_container.at(card_pos).get_card_face())
 					compatible_cards++;
 				if (compatible_cards >= 2) {
 					return true;
@@ -303,7 +303,7 @@ bool Hand::is_meldable(Card discard_head)
 				compatible_cards++;
 		}
 		
-		if ((compatible_cards>=1 && wild_cards >= 1) || (compatible_cards == 2))
+		if ((compatible_cards>=1 && wild_cards >= 1) || (compatible_cards >= 2))
 			return true;
 		else
 			return false;
@@ -351,8 +351,8 @@ bool Hand::hand_empty()
 
 bool Hand::has_canasta()
 {
-	for (int itr = 0; itr < meld_container.size(); itr++) {
-		if (is_canasta(itr))
+	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+		if (is_canasta(meld_pos))
 			return true;
 	}
 	return false;
@@ -405,10 +405,10 @@ void Hand::add_to_hand(std::vector<Card> card_to_add)
 
 void Hand::purge_red_threes()
 {
-	for (int itr = 0; itr < hand_container.size(); itr++) {
-		std::string card_string = hand_container.at(itr).get_card_string();
+	for (int card_pos = 0; card_pos < hand_container.size(); card_pos++) {
+		std::string card_string = hand_container.at(card_pos).get_card_string();
 		if (card_string == "3H" || card_string == "3D") {
-			Card red_three = hand_container.at(itr);
+			Card red_three = hand_container.at(card_pos);
 			create_meld(red_three);
 		}
 	}
@@ -435,10 +435,10 @@ void Hand::print_all_wilds_of_meld(int meld_pos)
 
 	int wild_counter = 0;
 
-	for (int itr = 0; itr < wild_meld.size(); itr++)
-		if (wild_meld.at(itr).isWild() && wild_meld.at(itr).get_has_transferred()==false) {
+	for (int meld_pos = 0; meld_pos < wild_meld.size(); meld_pos++)
+		if (wild_meld.at(meld_pos).isWild() && wild_meld.at(meld_pos).get_has_transferred()==false) {
 			wild_counter++;
-			std::cout << wild_counter << ". " << wild_meld.at(itr).get_card_string() << std::endl;
+			std::cout << wild_counter << ". " << wild_meld.at(meld_pos).get_card_string() << std::endl;
 		}
 }
 
@@ -446,9 +446,9 @@ std::vector<Card> Hand::get_wild_cards(int meld_pos)
 {
 	std::vector<Card> extraction_meld = meld_container.at(meld_pos);
 	std::vector<Card> wild_meld;
-	for (int itr = 0; itr < extraction_meld.size(); itr++)
-		if (extraction_meld.at(itr).isWild() && !(extraction_meld.at(itr).get_has_transferred()))
-			wild_meld.push_back(extraction_meld.at(itr));
+	for (int meld_pos = 0; meld_pos < extraction_meld.size(); meld_pos++)
+		if (extraction_meld.at(meld_pos).isWild() && !(extraction_meld.at(meld_pos).get_has_transferred()))
+			wild_meld.push_back(extraction_meld.at(meld_pos));
 	return wild_meld;
 }
 
@@ -456,9 +456,9 @@ std::vector<Card> Hand::get_wild_cards_ignore_transfer(int meld_pos)
 {
 	std::vector<Card> extraction_meld = meld_container.at(meld_pos);
 	std::vector<Card> wild_meld;
-	for (int itr = 0; itr < extraction_meld.size(); itr++)
-		if (extraction_meld.at(itr).isWild())
-			wild_meld.push_back(extraction_meld.at(itr));
+	for (int meld_pos = 0; meld_pos < extraction_meld.size(); meld_pos++)
+		if (extraction_meld.at(meld_pos).isWild())
+			wild_meld.push_back(extraction_meld.at(meld_pos));
 	return wild_meld;
 }
 
@@ -486,10 +486,10 @@ Card Hand::get_card_from_meld(int meld_pos, int card_pos)
 
 void Hand::clear_transfer_states()
 {
-	for (int meld = 0; meld < meld_container.size(); meld++) {
-		std::vector<Card> meld_to_change = meld_container.at(meld);
+	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
+		std::vector<Card> meld_to_change = meld_container.at(meld_pos);
 		for (int card = 0; card < meld_to_change.size(); card++)
-			meld_container.at(meld).at(card).set_has_transferred(false);
+			meld_container.at(meld_pos).at(card).set_has_transferred(false);
 	}
 }
 

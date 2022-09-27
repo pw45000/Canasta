@@ -40,7 +40,7 @@ Card Card::operator=(const Card& other_card)
 
 }
 
-Card::Card(Card&& other_card)
+Card::Card(Card&& other_card) noexcept
 {
 	this->face = other_card.face;
 	this->suit = other_card.suit;
@@ -57,7 +57,7 @@ Card::Card(Card&& other_card)
 
 }
 
-Card Card::operator=(Card&& other_card)
+Card Card::operator=(Card&& other_card) noexcept
 {
 	this->face = other_card.face;
 	this->suit = other_card.suit;

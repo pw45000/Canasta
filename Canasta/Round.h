@@ -28,7 +28,7 @@ public:
 
 
 	int coin_toss();
-	void main_round(bool has_loaded_file);
+	bool main_round(bool has_loaded_file);
 	void initial_draw();
 	int get_next_player() const;
 	void set_next_player(int next_player);

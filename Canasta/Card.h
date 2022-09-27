@@ -18,8 +18,8 @@ public:
 
 	Card(const Card& other_card);
 	Card operator=(const Card& other_card);
-	Card(Card&& other_card);
-	Card operator=(Card&& other_card);
+	Card(Card&& other_card) noexcept;
+	Card operator=(Card&& other_card) noexcept;
 
 	~Card();
 
