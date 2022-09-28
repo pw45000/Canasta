@@ -319,8 +319,13 @@ void Human::print_enemy_meld(std::vector<std::vector<Card>> enemy_meld)
 void Human::strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds)
 {
 	int choice = 0;
-	
+
+
 	do {
+		temp_print_hand();
+		print_enemy_meld(enemy_melds);
+		std::cout << "Discard pile: " << std::endl;
+		draw_decks.print_discard_pile();
 		std::cout << "What would you like advice regarding?" << std::endl;
 		std::cout << "1. Drawing" << std::endl;
 		std::cout << "2. Meld" << std::endl;
@@ -359,23 +364,11 @@ void Human::strategy_draw(Deck& draw_decks)
 		&& (!draw_decks.get_discard_is_frozen()))) {
 		std::cout << "You should draw from the discard pile: can meld with hand or add onto melds" 
 			<<" and you don't have a canasta, or do you have a canasta but need to purge your hand more." << std::endl;
-		std::vector<Card> picked_up_discard = draw_decks.draw_from_discard();
-		add_to_hand(picked_up_discard);
-		purge_red_threes();
 		return;
 	}
 
 	else if (!draw_decks.stock_is_empty()) {
 		std::cout << "You should draw from stock, because: ";
-
-		Card drawn_card;
-		do {
-			drawn_card = draw_decks.draw_from_stock();
-			add_to_hand(drawn_card);
-			purge_red_threes();
-		} while (drawn_card.is_red_three() && !draw_decks.stock_is_empty());
-
-
 		if (draw_decks.get_discard_is_frozen())
 			std::cout << "the discard pile is frozen." << std::endl;
 		else if (!can_meld)
@@ -457,7 +450,7 @@ void Human::strategy_meld(Deck& draw_decks, std::vector<std::vector<Card>> enemy
 					is_unique = false;
 			}
 			if (is_unique)
-				unique_faces.push_back(hand_container.at(card_pos));
+				unique_faces.push_back(no_duplicate_cards.at(card_pos));
 		}
 	}
 
@@ -548,13 +541,25 @@ void Human::strategy_meld(Deck& draw_decks, std::vector<std::vector<Card>> enemy
 		int second_card_pos = 1;
 		int wild_pos = 0;
 
-		Card first_nat_card = can_meld_with_wild.at(card_pos);
-		Card second_nat_card = can_meld_with_wild.at(second_card_pos);
-		Card third_wild_card = wild_cards_in_hand.at(wild_pos);
-		std::cout << "Meld the following: ";
-		print_vector(std::vector < Card >{first_nat_card, second_nat_card, third_wild_card});
-		std::cout << " as the two natural cards(ordered in highest order of points) can meld with a wild card. " << std::endl;
+		bool meld_already_exists = false;
+		//it's inevitable by the way natural meld aka the vector we're searching from that there will be
+		//duplicates. Hence, we can go against this and make sure there are none.
+		if (can_meld_with_wild.size() > 0) {
+			meld_already_exists = meld_of_card_exists(can_meld_with_wild.at(0));
+		}
 
+		else {
+			meld_already_exists = false;
+		}
+
+		if (!meld_already_exists) {
+			Card first_nat_card = can_meld_with_wild.at(card_pos);
+			Card second_nat_card = can_meld_with_wild.at(second_card_pos);
+			Card third_wild_card = wild_cards_in_hand.at(wild_pos);
+			std::cout << "Meld the following: ";
+			print_vector(std::vector < Card >{first_nat_card, second_nat_card, third_wild_card});
+			std::cout << " as the two natural cards(ordered in highest order of points) can meld with a wild card. " << std::endl;
+		}
 		//create_meld(first_nat_card, second_nat_card, third_wild_card);
 		emulated_size--;
 		has_done_action = true;
@@ -579,8 +584,10 @@ void Human::strategy_meld(Deck& draw_decks, std::vector<std::vector<Card>> enemy
 	meld_container = player_hand.get_meld();
 	sort_melds(meld_container);
 	int emulatd_wild_card_in_hand = (int)wild_cards_in_hand.size();
+
 	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
-		std::vector<Card> wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(meld_pos);
+		int absolute_meld_pos = get_absolute_pos_from_relative_meld(meld_container.at(meld_pos));
+		std::vector<Card> wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(absolute_meld_pos);
 		int emulated_wild_card_size = (int)wild_cards_from_meld.size();
 		if (meld_container.at(meld_pos).size() >= 3 && emulated_wild_card_size <= 3) {
 
@@ -599,7 +606,7 @@ void Human::strategy_meld(Deck& draw_decks, std::vector<std::vector<Card>> enemy
 				emulatd_wild_card_in_hand--;
 				emulated_wild_card_size++;
 
-				wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(meld_pos);
+				wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(absolute_meld_pos);
 			}
 		}
 	}
@@ -610,6 +617,7 @@ void Human::strategy_meld(Deck& draw_decks, std::vector<std::vector<Card>> enemy
 		std::vector<Card> meld = meld_container.at(meld_pos);
 		int can_meld_to_canasta_sum = meld.size() + 3 - (int)get_wild_cards_from_vector(meld).size();
 		int min_for_canasta = 7;
+		int emulated_meld_size = meld.size();
 		player_hand = get_player_hand();
 		meld_container = player_hand.get_meld();
 		if (can_meld_to_canasta_sum >= min_for_canasta && meld.size() < 7 && !has_canasta()) {
@@ -623,14 +631,15 @@ void Human::strategy_meld(Deck& draw_decks, std::vector<std::vector<Card>> enemy
 				std::vector<Card> meld_to_extract_wilds = meld_container.at(other_melds_pos);
 				if (meld_to_extract_wilds.size() > 3) {
 					std::vector<Card> wild_to_transfer = player_hand.get_wild_cards(other_melds_pos);
-					while (wild_to_transfer.size() != 0) {
+					while (wild_to_transfer.size() != 0 && emulated_meld_size>3) {
 						has_done_action = true;
 						//transfer_card(wild_to_transfer.at(0), other_melds_pos, meld_pos);
-						std::cout << "Transfer the  card " << wild_to_transfer.at(0).get_card_string() <<
-							"from meld: ";  print_meld(other_melds_pos); std::cout << std::endl;
+						std::cout << "Transfer the card " << wild_to_transfer.at(0).get_card_string() <<
+							" from meld: ";  print_meld(other_melds_pos); std::cout << std::endl;
 						std::cout << "As meld: "; print_meld(meld_pos);
 						std::cout << "can be made as a Canasta with just a few more wildcards." << std::endl;
 						wild_to_transfer.erase(wild_to_transfer.begin());
+						emulated_meld_size--;
 					}
 				}
 
@@ -776,8 +785,6 @@ void Human::strategy_discard(Deck& draw_decks, std::vector<std::vector<Card>> en
 		draw_decks.set_discard_freeze(false);
 	}
 
-	draw_decks.discard_push_front(preferred_card);
-	remove_from_hand(preferred_card);
 
 }
 

@@ -1,0 +1,19 @@
+Round: 1
+
+Computer:
+   Score: 0
+   Hand: 4D 6H 6D 6S 7C 7S 9H XC XH XS QD KS 2S 2H AD 
+   Melds: 
+
+
+Human:
+   Score: 0
+   Hand: 3S 4D 4S 4C 6H 7H 8H 8D 8H 9C QH KH KH 2H AC 
+   Melds: [ 3D ] 
+
+
+Stock: 9S 3C JS 3D J4 5C 8C AH 8S 7S QH QC JH 7D 2D QS 4H 2C 4S JC 8D 8C 9C JC XC 7D 5H KD AC 5S 2C 5C KD 4H J1 9D 6C KS 9S QC QD 5H 9D J3 3H 3C KC 5D JH 7H AD 4C J2 AS AS JS 2S AH 6D XS 3H XD KC 2D QS 5S JD 5D 9H XH 8S JD 3S 6C 7C XD 
+Discard Pile: 6S 
+
+Next Player: Human
+

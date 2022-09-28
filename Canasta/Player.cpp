@@ -174,8 +174,8 @@ void Player::sort_melds(std::vector<std::vector<Card>> &melds_to_sort)
 {
 	int first_card_pos = 0;
 	std::sort(melds_to_sort.begin(), melds_to_sort.end(),
-		[first_card_pos](const std::vector<Card>& lhs, const std::vector<Card>& rhs) {
-			return lhs.size() > rhs.size();
+		[](const std::vector<Card>& lhs, const std::vector<Card>& rhs) {
+			return lhs.at(0) > rhs.at(0);
 		});
 }
 

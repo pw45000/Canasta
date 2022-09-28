@@ -215,7 +215,7 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 					is_unique = false;
 			}
 			if (is_unique)
-				unique_faces.push_back(hand_container.at(card_pos));
+				unique_faces.push_back(no_duplicate_cards.at(card_pos));
 		}
 	}
 
@@ -238,7 +238,7 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 		bool meld_already_exists = false;
 
 		if (natural_meld_vector.size() > 0) {
-			meld_already_exists = meld_of_card_exists(natural_meld_vector.at(0));
+				meld_already_exists = meld_of_card_exists(natural_meld_vector.at(0));
 		}
 
 		else {
@@ -311,15 +311,31 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 		Card first_nat_card = can_meld_with_wild.at(card_pos);
 		Card second_nat_card = can_meld_with_wild.at(second_card_pos);
 		Card third_wild_card = wild_cards_in_hand.at(wild_pos);
-		std::cout << "The CPU decided to meld: ";
-		print_vector(std::vector < Card >{first_nat_card, second_nat_card, third_wild_card});
-		std::cout << " as the two natural cards(ordered in highest order of points) can meld with a wild card. " << std::endl;
+		
+		bool meld_already_exists = false;
 
-		create_meld(first_nat_card, second_nat_card, third_wild_card);
-		has_done_action = true;
-		//delete the pair at the beginning of the vector
-		can_meld_with_wild.erase(can_meld_with_wild.begin()+ card_pos);
-		can_meld_with_wild.erase(can_meld_with_wild.begin() + card_pos);
+		//it is inevitable duplicates from the natural meld vector will exist. Therefore, we need to 
+		//ensure they are not melded.
+		if (can_meld_with_wild.size() > 0) {
+			meld_already_exists = meld_of_card_exists(can_meld_with_wild.at(0));
+		}
+
+		else {
+			meld_already_exists = false;
+		}
+		
+		
+		if (!meld_already_exists) {
+			std::cout << "The CPU decided to meld: ";
+			print_vector(std::vector < Card >{first_nat_card, second_nat_card, third_wild_card});
+			std::cout << " as the two natural cards(ordered in highest order of points) can meld with a wild card. " << std::endl;
+
+			create_meld(first_nat_card, second_nat_card, third_wild_card);
+			has_done_action = true;
+		}
+			//delete the pair at the beginning of the vector
+			can_meld_with_wild.erase(can_meld_with_wild.begin() + card_pos);
+			can_meld_with_wild.erase(can_meld_with_wild.begin() + card_pos);
 		
 		//since the cards are in pairs.
 		player_hand = get_player_hand();
@@ -336,19 +352,20 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 		wild_cards_in_hand = player_hand.get_wild_cards_from_hand();
 		meld_container = player_hand.get_meld();
 		sort_melds(meld_container);
-		std::vector<Card> wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(meld_pos);
+		int absolute_meld_pos = get_absolute_pos_from_relative_meld(meld_container.at(meld_pos));
+		std::vector<Card> wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(absolute_meld_pos);
 		
 		if (meld_container.at(meld_pos).size() >= 3 && wild_cards_from_meld.size()<=3) {
 
 			//prevent an underflow error.
 			while ((((int)wild_cards_in_hand.size() - amount_of_dangerous_cards) > 0) && wild_cards_from_meld.size() < 3) {
 
-				int absolute_meld_pos = get_absolute_pos_from_relative_meld(meld_container.at(meld_pos));
+				absolute_meld_pos = get_absolute_pos_from_relative_meld(meld_container.at(meld_pos));
 				has_done_action = true;
 
 				std::cout << "The CPU chose to lay off the card " << wild_cards_in_hand.at(0).get_card_string() <<
 					" because the meld chose, ";
-				print_vector(meld_container.at(absolute_meld_pos));
+				print_vector(meld_container.at(meld_pos));
 				std::cout << " had the highest size and less than 3 wild cards, so it prioritized it." << std::endl;
 				lay_off(wild_cards_in_hand.at(0), absolute_meld_pos);
 
@@ -356,7 +373,7 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 
 				player_hand = get_player_hand();
 				wild_cards_in_hand = player_hand.get_wild_cards_from_hand();
-				wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(meld_pos);
+				wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(absolute_meld_pos);
 			}
 		}
 	}
@@ -367,9 +384,10 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 		std::vector<Card> meld = meld_container.at(meld_pos);
 		int can_meld_to_canasta_sum = meld.size() + 3 - get_wild_cards_from_vector(meld).size();
 		int min_for_canasta = 7;
+		bool has_transferred = false;
 		player_hand = get_player_hand();
 		meld_container = player_hand.get_meld();
-		if (can_meld_to_canasta_sum >= min_for_canasta && meld.size()<7 && !has_canasta()) {
+		if (can_meld_to_canasta_sum >= min_for_canasta && (meld.size()<6 && meld.size()>3) && !has_canasta()) {
 			int other_melds_pos = (meld_pos == meld_container.size() - 1) ? 0 : meld_pos + 1;
 			while (other_melds_pos != meld_pos) {
 				
@@ -380,14 +398,16 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 				std::vector<Card> meld_to_extract_wilds = meld_container.at(other_melds_pos);
 				if (meld_to_extract_wilds.size() > 3) {
 					std::vector<Card> wild_to_transfer = player_hand.get_wild_cards(other_melds_pos);
-					while (wild_to_transfer.size() != 0) {
+					while (wild_to_transfer.size() != 0 && meld_to_extract_wilds.size() > 3) {
 						has_done_action = true;
 						std::cout << "CPU decided to transfer card " << wild_to_transfer.at(0).get_card_string() <<
 							" from meld: ";  print_meld(other_melds_pos);
 						std::cout << "As meld: "; print_meld(meld_pos);
 						std::cout << " can be made as a Canasta with just a few more wildcards." << std::endl;
 						transfer_card(wild_to_transfer.at(0), other_melds_pos, meld_pos);
-	
+						player_hand = get_player_hand();
+						meld_container = player_hand.get_meld();
+						meld_to_extract_wilds = meld_container.at(other_melds_pos);
 						wild_to_transfer.erase(wild_to_transfer.begin());
 					}
 				}

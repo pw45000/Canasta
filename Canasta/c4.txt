@@ -3,7 +3,7 @@ Round: 2
 Computer:
    Points: 740
    Hand:  XS XD  2D  3C
-   Melds: [5H 5C 5S 5D]  [7H 7C 7S 7D]  [9H 9C 9S 9D]  [QH QC QS QD]  [3D 3D 3H 3H]
+   Melds: [5H 5C 5S 5D]  [7H 7C 7S 7D]  [9H 9C 9S 9D]  [QH QC QS QD]  [3D] [3D] [3H] [3H]
 
 Human:
    Points: 610

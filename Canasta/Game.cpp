@@ -47,7 +47,7 @@ void Game::main_menu()
 				main_game(loading_round);
 			}
 			else
-				std::cout << "Failed to load file!" << std::endl;
+				std::cout << "Failed to load file or the user inputted 0 to quit!" << std::endl;
 			break;
 		}
 		case 3: {

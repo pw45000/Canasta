@@ -6,7 +6,13 @@
 *********************************************************** */
 #include "Card.h"
 
-
+/* *********************************************************************
+Function Name: Card
+Purpose: The destructor for the Card class.
+Parameters: none
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 
 Card::~Card()
 {
@@ -18,7 +24,13 @@ Card::~Card()
 }
 
 
-
+/* *********************************************************************
+Function Name: Card
+Purpose: The copy constructor for the Card class.
+Parameters: other_card, a Card reference to the Card being copied from.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 Card::Card(const Card& other_card)
 {
 	point_value = other_card.get_point_value();
@@ -28,6 +40,13 @@ Card::Card(const Card& other_card)
 	this->has_transferred = other_card.get_has_transferred();
 }
 
+/* *********************************************************************
+Function Name: Card operator=
+Purpose: The copy assignment operator for the Card class.
+Parameters: other_card, a Card reference to the Card being copied from..
+Return Value: A card value that is a copy of the passed Card class.
+Assistance Received: none
+********************************************************************* */
 Card Card::operator=(const Card& other_card)
 {
 	this->face = other_card.face;
@@ -40,6 +59,14 @@ Card Card::operator=(const Card& other_card)
 
 }
 
+
+/* *********************************************************************
+Function Name: Card
+Purpose: The move copy operator for the Card class. 
+Parameters: other_card, a Card rvalue reference to the Card being copied from.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 Card::Card(Card&& other_card) noexcept
 {
 	this->face = other_card.face;
@@ -57,6 +84,13 @@ Card::Card(Card&& other_card) noexcept
 
 }
 
+/* *********************************************************************
+Function Name: Card operator=
+Purpose: The copy assignment operator for the Card class.
+Parameters: other_card, a Card rvalue reference to the Card being copied from..
+Return Value: A card value that is a copy of the passed Card class.
+Assistance Received: none
+********************************************************************* */
 Card Card::operator=(Card&& other_card) noexcept
 {
 	this->face = other_card.face;
@@ -91,7 +125,7 @@ Assistance Received: none
 Card::Card() : face(0), suit(0), point_value(0) {
 	//strings cannot be constructor initialized, 
 	//so they need to be set manually.
-	this->string_representation = "NULL";
+	this->string_representation = "EMPTY DISCARD PILE";
 	this->has_transferred = false;
 };
 
@@ -193,6 +227,12 @@ void Card::calculate_point_value(char face, char suit) {
 	case '9': 
 	case 'X': 
 	case 'J':
+		if (isdigit(suit)) {
+			this->point_value = 50;
+		}
+		else
+			this->point_value = 10;
+		break;
 	case 'Q':
 	case 'K': 
 		this->point_value = 10;
@@ -367,7 +407,7 @@ bool Card::isSpecial() const {
 
 /* *********************************************************************
 Function Name: isNatural()
-Purpose: Returns if the current card is a natural card
+Purpose: Returns if the current card is a natural card.
 Parameters: none
 Return Value: bool for if the current card is a natural card or not.
 Assistance Received: none
@@ -375,7 +415,13 @@ Assistance Received: none
 bool Card::isNatural() const {
 	return (!(isSpecial() && isWild()));
 }
-
+/* *********************************************************************
+Function Name: is_red_three()
+Purpose: Returns if the current card is a red three.
+Parameters: none
+Return Value: bool for if the current card is a red three card or not.
+Assistance Received: none
+********************************************************************* */
 bool Card::is_red_three() const
 {
 	if (string_representation == "3H" || string_representation == "3D")
@@ -384,18 +430,48 @@ bool Card::is_red_three() const
 		return false;
 }
 
+/* *********************************************************************
+Function Name: is_joker()
+Purpose: Returns if the current card is a joker card by checking if the suite is a digit.
+Parameters: none
+Return Value: bool for if the current card is a natural card or not.
+Assistance Received: none
+********************************************************************* */
 bool Card::is_joker() const
 {
 	return isdigit(suit);
 }
 
+/* *********************************************************************
+Function Name: get_has_transferred()
+Purpose: Returns if the current card is transferred by getting the data member variable has_transferred,
+which represents this symbolically.
+Parameters: none
+Return Value: bool for if the data member variable has_transferred is true or false.
+Assistance Received: none
+********************************************************************* */
 bool Card::get_has_transferred() const
 {
 	return has_transferred;
 }
 
+/* *********************************************************************
+Function Name: get_numeric_value()
+Purpose: Translates the face of the card (stored as a char) back to an int. 
+			Typically used for sorting cards in a vector.
+Parameters: none
+Return Value: int representing the integer value of the face of the card.
+Algorithm: 
+			1). A switch case is provided that assigns a case based on the face of the card.
+			2). Depending on the case, it'll return an int value corresponding to the value of the card. 
+			    For non numeric values, it'll return the number based on their position after being made in the Deck.
+				 In the case of J, depending on the suit of the card, it'll either be 12(Jack's numeric value)
+				 or 15 (Joker's numeric value).
+Assistance Received: none
+********************************************************************* */
 int Card::get_numeric_value() const
 {
+	//this is a value that helps us convert chars to ints using ASCII arithimetic.
 	int ascii_offset = 48;
 	
 	switch (face) {

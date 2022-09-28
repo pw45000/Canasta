@@ -277,12 +277,12 @@ bool Round::load_game()
 {
 	std::cout << "Please enter the file you wish to load. Say 0 to quit." << std::endl;
 	std::string input_file_name;
+	getline(std::cin, input_file_name);
+
 	if (input_file_name == "0") {
 		return false;
 	}
 
-
-	getline(std::cin, input_file_name);
 	std::ifstream file_to_load(input_file_name);
 	std::string extracted_string;
 	std::vector<std::string> lines_to_parse;
@@ -451,7 +451,7 @@ bool Round::string_is_card(std::string card_string)
 		char suite = card_string.at(1);
 
 		std::string rank_list = "123456789XAJQK";
-		std::string suite_list = "HDCS12345678";
+		std::string suite_list = "HDCS1234";
 
 		if (rank_list.find(rank) != std::string::npos && suite_list.find(suite) != std::string::npos)
 			return true;
@@ -604,11 +604,21 @@ bool Round::load_next_player(std::string next_player_str) {
 	next_player_str = next_player_str.substr(next_player_str.find(" ") + 1);
 	
 	if (next_player_str == "Player: Human") {
-		set_next_player(2);
+		for (int player_pos = 0; player_pos < players.size(); player_pos++) {
+			if (players.at(player_pos)->get_player_type() == "Human") {
+				set_next_player(player_pos+1);
+				break;
+			}
+		}
 		return true;
 	}
 	else if (next_player_str == "Player: Computer") {
-		set_next_player(1);
+		for (int player_pos = 0; player_pos < players.size(); player_pos++) {
+			if (players.at(player_pos)->get_player_type() == "Computer") {
+				set_next_player(player_pos+1);
+				break;
+			}
+		}
 		return true;
 	}
 	else {

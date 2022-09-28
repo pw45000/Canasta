@@ -36,7 +36,7 @@ void Deck::create_stock_pile()
 	stock_pile.push_back(Card('J', '1', "J1", 50));
 	stock_pile.push_back(Card('J', '2', "J2", 50));
 	stock_pile.push_back(Card('J', '3', "J3", 50));
-	stock_pile.push_back(Card('J', '1', "J4", 50));
+	stock_pile.push_back(Card('J', '4', "J4", 50));
 
 }
 
