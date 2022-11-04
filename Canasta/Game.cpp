@@ -1,17 +1,32 @@
-#include "Game.h"
 /* ***********************************************************
 * Name:  Patrick Wierzbicki*
-* Project : Cansta P1*
-* Class : class numberand name here*
-* Date : 9/13/22*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
 *********************************************************** */
+#include "Game.h"
 
+
+/* *********************************************************************
+Function Name: Game
+Purpose: The default Game constructor. 
+Parameters: none
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 Game::Game()
 {
 	round = 0;
+	players.reserve(2);
 
 }
-
+/* *********************************************************************
+Function Name: Game
+Purpose: The Game destructor. Deletes any new players allocated on the heap.
+Parameters: none
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 Game::~Game() {
 	if (players.size() > 0) {
 		delete players.at(0);
@@ -19,13 +34,42 @@ Game::~Game() {
 	}
 }
 
+/* *********************************************************************
+Function Name: Game
+Purpose: The Game copy constructor. Made to satisfy the rule of 3.
+Parameters: other_game: a const reference to another Game Class from which to be copied.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
+Game::Game(const Game& other_game)
+{
+	players = other_game.players;
+	round = other_game.round;
+}
 
 
+/* *********************************************************************
+Function Name: main_menu
+Purpose: The function which represents the main menu of the game.
+Parameters: none
+Algorithm: 
+			1. Creates a do-while loop to simulate a menu playing until a player quits. 
+				In this case, the case to break this loop will be 3. 
+			2. For each iteration of this do while loop, display a prompt with 3 options: 
+				New Game, Load Game, Exit, and validate a range based input. 
+			3. Depending on each choice, either:
+				a) make a new game by choose_player_type
+				b) Attempt to load a round, and if successful, proceed to the loaded round.
+				c) Exit the game.
+Local variables: 
+					 choice, an int which represents the input of the user.
+					 loading_Round, a Round class which represents a new round from which will be loaded into.
+					 load_success, a bool which represents if the new round is successfully loaded.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 void Game::main_menu()
 {
-	std::string input_string;
-
-
 	int choice = 0;
 	
 	//to avoid stopping after the first return to main menu.
@@ -60,6 +104,24 @@ void Game::main_menu()
 
 }
 
+/* *********************************************************************
+Function Name: choose_player_type
+Purpose: The function which represents choosing the player type after selecting new game.
+Parameters: none
+Algorithm:
+			1. Creates a do-while loop to simulate a menu playing until a player quits.
+				In this case, the case to break this loop will be 3.
+			2. For each iteration of this do while loop, display a prompt with 3 options:
+				Player vs Player, Player vs Computer, Exit to Main Menu, and validate a range based input.
+			3. Depending on each choice, either:
+				a) Make a new game by pushing two new Humans to players and then call main_game to play the game.
+				b) Make a new game by pushing one Human and one Computer(AI) to players and then call main_game to play the game.
+				c) Exit to main menu.
+Local variables: 
+					 choice: an integer which represents the chosen input.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 void Game::choose_player_type()
 {
 	std::string input_string;
@@ -106,23 +168,48 @@ void Game::choose_player_type()
 	} while (choice != 3);
 }
 
+
+/* *********************************************************************
+Function Name: main_game
+Purpose: The function which acts the main game loop, including taking care of score, players, Rounds, etc...
+Parameters: none
+Algorithm:
+			1. Create a do-while loop to enclose input regarding whether to play another round or not.
+				this loop will break if the player has quit or the player chose not to player another around.
+			2. Create a new Round object, constructing with the Game's players and tracked round number.
+			3. Call the round object with false, since a round hasn't been loaded. The round will return if the player has quit.
+			4. If the player hasn't quit and the round is over, ask if they want to play another round, and validate the prompted
+				inputed choice. Each time, each player's hand is cleared.
+			5. Once the player decides to end the round or the round ends, see if they quit. If not, display who won.
+			6. Clear the players and delete the memory allocated on the heap representing the players.
+Local variables:
+					 choice: an integer which represents the chosen input in the input loop.
+					 round_number: an integer representing the current round number.
+					 player_1: a Player* representing the first player.
+					 player_2: a Player* representing the second player.
+					 has_quit: a bool representing if the player quit or not.
+
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 void Game::main_game()
 {
 	int choice = 0;
 	int round_number = 0;
-	auto player_1 = players.at(0);
-	auto player_2 = players.at(1);
+	Player* player_1 = players.at(0);
+	Player* player_2 = players.at(1);
 	bool has_quit = false;
 
 	do {
 		round_number++;
 		Round game_round(players, round_number);
 		has_quit = game_round.main_round(false);
-		if (has_quit) break;
-		std::cout << "Would you like to another round?" << std::endl;
-		std::cout << "1. Yes" << std::endl;
-		std::cout << "2. No" << std::endl;
-		choice = validate_option_based_input(1, 2);
+		if (!has_quit) {
+			std::cout << "Would you like to another round?" << std::endl;
+			std::cout << "1. Yes" << std::endl;
+			std::cout << "2. No" << std::endl;
+			choice = validate_option_based_input(1, 2);
+		}
 		player_1->clear_hand_and_meld();
 		player_2->clear_hand_and_meld();
 	} while (choice != 2 && has_quit == false);
@@ -137,15 +224,40 @@ void Game::main_game()
 }
 
 
+/* *********************************************************************
+Function Name: main_game
+Purpose: The function which acts the main game loop, including taking care of score, players, Rounds, etc...
+Parameters: loaded_round, a Round reference to the round currently loaded in the main menu of Game.
+Algorithm:
+			1. Create a do-while loop to enclose input regarding whether to play another round or not.
+				this loop will break if the player has quit or the player chose not to player another around.
+			2. Create a new Round object, constructing with the Game's players and tracked round number.
+			3. Either the following will happen based on the loop_count being 0(loaded) or >0 (past loaded round): 
+					a) Call the round object with false, since a round hasn't been loaded. The round will return if the player has quit.
+					b) Call the round object with true, since a round has been loaded. The round will return if a player has quit.
+			4. If the player hasn't quit and the round is over, ask if they want to play another round, and validate the prompted
+				inputed choice. Each time, each player's hand is cleared.
+			5. Once the player decides to end the round or the round ends, see if they quit. If not, display who won.
+			6. Clear the players and delete the memory allocated on the heap representing the players.
+Local variables:
+					 choice: an integer which represents the chosen input in the input loop.
+					 round_number: an integer representing the current round number.
+					 loop_count: an integer representing how many times a round has been played since being loaded.
+					 player_1: a Player* representing the first player.
+					 player_2: a Player* representing the second player.
+					 has_quit: a bool representing if the player quit or not.
 
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 void Game::main_game(Round &loaded_round)
 {
 	int choice = 0;
 	int round_number = 0;
 	int loop_count = 0;
 	
-	auto player_1 = players.at(0);
-	auto player_2 = players.at(1);
+	Player* player_1 = players.at(0);
+	Player* player_2 = players.at(1);
 	bool has_quit = false;
 
 	do {
@@ -155,14 +267,15 @@ void Game::main_game(Round &loaded_round)
 			Round game_round(players, round_number);
 			has_quit = game_round.main_round(false);
 		}
-		if (has_quit) break;
 		
-		std::cout << "Would you like to another round?" << std::endl;
-		std::cout << "1. Yes" << std::endl;
-		std::cout << "2. No" << std::endl;
-		choice = validate_option_based_input(1, 2);
-		round_number++;
-		loop_count++;
+		if (!has_quit) {
+			std::cout << "Would you like to another round?" << std::endl;
+			std::cout << "1. Yes" << std::endl;
+			std::cout << "2. No" << std::endl;
+			choice = validate_option_based_input(1, 2);
+			round_number++;
+			loop_count++;
+		}
 		player_1->clear_hand_and_meld();
 		player_2->clear_hand_and_meld();
 		
@@ -174,23 +287,22 @@ void Game::main_game(Round &loaded_round)
 	delete players.at(0);
 	delete players.at(1);
 	players.clear();
-
 }
 
-//https://stackoverflow.com/questions/20814703/should-i-delete-static-object-in-c
-//empty for now due to this.
 
-Game::Game(const Game& other_game)
-{
-	players = other_game.players;
-	round = other_game.round;
-}
+
+/* *********************************************************************
+Function Name: decide_winner
+Purpose: Gets the total score for each player and then annouces the winner.
+Parameters: none
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 
 void Game::decide_winner()
 {
 	auto player_1 = players.at(0);
 	auto player_2 = players.at(1);
-
 
 	int player_1_score = player_1->get_score();
 	int player_2_score = player_2->get_score();
@@ -204,8 +316,33 @@ void Game::decide_winner()
 		std::cout << "Victory for life: Player 2 (" << player_2->get_player_type() << ") with a score of " << player_2_score << std::endl;
 		std::cout << "Dejected Loser: Player 1 (" << player_1->get_player_type() << ") with a score of " << player_1_score << std::endl;
 	}
-
 }
+
+
+
+/* *********************************************************************
+Function Name: validate_option_based_input
+Purpose: Validating option based input in a lower and upper bound.
+Parameters: 
+			  lower_bound, an int that represents the lower bound of acceptable input.
+			  upper_bound, an int that represents the upper bound of acceptable input.
+Algorithm:
+			 1). Use a do-while loop to simulate continous input which will break when input is valid. 
+			     Within this input, prior to input,
+				  the cin buffer is cleared and all prior input(including newlines) is ignored. 
+			 2). There are cases in which the input will always be false: 
+						a) The input is not within upper or lower bounds.
+						b) The input is not numeric.
+			 3). If the input is none of these cases, then convert the string into an integer and store it, and set the input to be valid.
+			 4). Return the valid inputted choice. 
+
+			
+Local variables:
+
+
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 
 int validate_option_based_input(int lower_bound, int upper_bound)
 {
@@ -237,6 +374,35 @@ int validate_option_based_input(int lower_bound, int upper_bound)
 	
 	return converted_option;
 }
+
+
+/* *********************************************************************
+Function Name: validate_option_based_input
+Purpose: Validating option based input in a lower and upper bound.
+Parameters:
+			  lower_bound, an int that represents the lower bound of acceptable input.
+			  upper_bound, an int that represents the upper bound of acceptable input.
+			  special_option, a bool that tells if the function should accept -1 as an acceptable input.
+Algorithm:
+			 1). Use a do-while loop to simulate continous input which will break when input is valid.
+				  Within this input, prior to input,
+				  the cin buffer is cleared and all prior input(including newlines) is ignored.
+			 2). There are cases in which the input will always be false:
+						a) The input is not within upper or lower bounds.
+						b) The input is not numeric.
+			 3). If the input is none of these cases or is -1, 
+			 then convert the string into an integer and store it, and set the input to be valid.
+			 4). Return the valid inputted choice.
+
+
+Local variables:
+
+
+Return Value: none
+Assistance Received: Some parts of the input validation came from past projects of mine, 
+such as the VC8000 computer, https://github.com/pw45000/VC-8000.
+********************************************************************* */
+
 int validate_option_based_input(int lower_bound, int upper_bound, bool special_option)
 {
 	std::string input;
@@ -270,4 +436,3 @@ int validate_option_based_input(int lower_bound, int upper_bound, bool special_o
 
 	return converted_option;
 }
-//parts taken from past project VC8000, plug github link

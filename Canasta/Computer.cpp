@@ -1,11 +1,22 @@
+/* ***********************************************************
+* Name:  Patrick Wierzbicki*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
+*********************************************************** */
+
 #include "Computer.h"
 #include <iostream>
 
-Computer::Computer()
-{
-	meld_cut_off = 5;
-}
-
+/* *********************************************************************
+Function Name: play
+Purpose: The main gameplay loop for each player.
+Parameters:
+			 draw_decks: a Deck reference which represents the discard and stock pile from the Round.
+			 enemy_melds: a vector of vectors of Card which represents the enemy's melds.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 bool Computer::play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds)
 {
 	bool immeadiate_break;
@@ -28,6 +39,39 @@ bool Computer::play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds
 	return false;
 }
 
+/* *********************************************************************
+Function Name: discard
+Purpose: The Computer's strategy regarding the discard phase.
+Parameters:
+			 draw_decks: a Deck reference which represents the discard and stock pile from the Round.
+			 enemy_melds: a vector of vectors of Card which represents the enemy's melds.
+Algorithm:
+			1. First, the CPU will create a vector of all cards that aren’t in the enemy’s melds, 
+				as well as a list of all cards that aren’t wild cards, based on a sorted hand from least to greatest points.
+			2. Then, it’ll see if the top of the discard is in the enemy’s melds. 
+				If so, it’ll check if it has a 3 of spades or clubs, and discard that. 
+			3. Otherwise, it’ll attempt to discard from the vector of all cards that aren’t in enemy’s melds. 
+			4. Otherwise, it’ll attempt to discard cards that aren’t wild cards.
+			5. Otherwise, it’ll attempt to discard a card at the lowest point value in the hand. 
+			6. Finally, if there’s nothing to discard, it’ll skip the discard turn.
+
+Local variables:
+			preference_discard: a vector of Cards representing what the Computer has the top preference to discard, 
+			i.e. the cards that are not in the enemy's melds.
+			not_in_melds_but_wilds: a vector of Cards representing what the Computer has in terms of wild cards.
+			no_wild_discard; a vector of Cards that is all natural cards, regardless of if they're in the enemy's melds.
+			player_hand: a Hand representing the player's hand for comparisons.
+			hand_container: a vector of Cards' representing the Computer's hand.
+			card_to_search: the Card to be searched for if it's in the enemy's melds.
+			preferred_card: the Card that is the most preferred to be discarded.
+			first_card_pos: the first position in all vectors, particularly ones containing cards.
+			has_discarded_three: a bool representing if the Computer already chose to discard a three.
+			three_spades_itr: an iterator representing if the Computer found a three of spades in it's hand.
+			three_clubs_itr: an iterator representing if the Computer found a three of clubs in it's hand.
+
+Return Value: none.
+Assistance Received: none
+********************************************************************* */
 void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds)
 {
 	std::vector<Card> preference_discard; 
@@ -149,6 +193,70 @@ void Computer::discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_me
 
 }
 
+/* *********************************************************************
+Function Name: meld
+Purpose: The Computer's strategy regarding the meld phase.
+Parameters:
+			 draw_decks: a Deck reference which represents the discard and stock pile from the Round.
+			 enemy_melds: a vector of vectors of Card which represents the enemy's melds.
+Algorithm:
+			1. The computer will consider first if any of the cards in its hand can be made as a 
+				canasta when discarded to the enemy (i.e. enemy has 6 4s then it’ll hold onto a 4). 
+				If it sees this, it’ll play more conservatively, holding onto cards in its hand 
+				by restricting the total number of cards laid off per meld by the size of dangerous cards.
+				So if the CPU has a hand of 5, it’ll always keep 2 cards, except for natural melds.
+			2. The computer will first make a copy of unique faces in the hand. 
+				Then, it’ll see how many cards are there that make up that unique face(if they are natural). 
+				If the face is already in a pre-existing meld, it’ll search and find the meld, and add onto it. 
+				If not, if the cards found are greater than 3, it’ll create a meld. If there’s two natural cards, save for later, 
+				as they can be potentially melded with a wild card. If there’s just one, see if it can be laid off 
+				(this might be removed for redundancy purposes). 
+		   3. Then, the cards that have a potential to be melded with wild cards are sorted in ascending order. 
+				Each pair is melded with a vector of wild cards, while both aren’t empty. When choosing to meld with wild cards, 
+				it’ll choose the meld with the highest score. 
+         4. Afterward, the CPU will sort a temporary vector of vectors of the meld container by size, 
+				and decide by the order of size which melds are best to lay off wild cards. 
+         5. Afterward, if the CPU sees that a meld can be made as a canasta through transferring wildcards, 
+				it’ll do so from extracting wild cards from other melds greater than the size of 3, but less than a size of 7. 
+         6. If the CPU did none of the aforementioned strategies above, 
+				it’ll say it did nothing, also stating if this decision was due to seeing a 
+				dangerous card(a card that if discarded will give the enemy a canasta) in it’s hand.
+
+
+Local variables:
+			player_hand: a Hand representing the player's hand and melds.
+			hand_container: a vector of Cards representing the player's hand.
+			meld_container: a vector of Cards representing the player's melds.
+			no_duplicate_card: a vector of Cards representing all unique cards in the player's hand.
+			unique_faces: a vector of Cards representing all unique faces derived from no_duplicate_card.
+			natural_meld_vector: a vector of Cards which represents all natural cards in the Hand.
+			can_meld_with_wild: a vector of Cards which represents a pair of two Cards with the same face.
+			wild_cards_in_hand: a vector of Cards which represents all the wild cards in a player's hand.
+			transfer_to_hand: an int representing the option to transfer a card to a player's hand. 
+			amount_of_dangerous_cards: an int representing how many cards there are in the Computer's hand, if discarded, 
+			will give the enemy a free canasta. 
+			has_done_action: a bool representing if the Computer has melded, added to a meld, or transferred wild cards.
+			first_card, second_card, third_card: Cards representing the 1st, 2nd, and 3rd card in a meld.
+			first_nat_card... third_nat_card: Cards representing the 1st, 2nd, and 3rd natural cards in a meld.
+			can_meld_to_canasta_sum: the sum needed to get a canasta, gained by gathering the size of the meld plus 3 minus the wild cards
+				in the meld, so to see if it can be transferred.
+			min_for_canasta: an int representing the minimum size a meld has to be to be a canasta (7).
+			meld_already_exists: a bool representing if a meld of a particular Card's face already exists.
+			meld_to_extract_wilds: a vector of Cards representing the meld in particular, to extract wild cards from to transfer cards to another meld.
+			absolute_meld_pos: the absolute value of the position of a particular meld with respect to the unsorted meld container in the Player's Hand.
+			wild_to_transfer: The meld at which the wild cards should be transferred from.
+			meld: a vector of Cards representing a single meld within an iteration over the meld_container.
+			extracted_face: the face extracted from a Card to see if there is a meld that already exists in meld_container.
+			card_pos: an int which represents the position of a first Card in a potential meld.
+			second_card_pos: an int which represents the position of a second Card in a potential meld.
+			wild_pos: an int which represents the position of a wild card in a given meld or hand.
+
+Return Value: none.
+Assistance Received: Particulary in regards to unique and adding in an inaxproimate amount of cards, I used the following: 
+	//https://cplusplus.com/reference/iterator/back_inserter/
+	//https://stackoverflow.com/questions/52150939/cant-dereference-value-initialized-iterator
+********************************************************************* */
+
 void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 {
 	Hand player_hand = get_player_hand();
@@ -168,14 +276,12 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 			<< std::endl;
 	}
 
-	//https://cplusplus.com/reference/iterator/back_inserter/
-	//https://stackoverflow.com/questions/52150939/cant-dereference-value-initialized-iterator
-	//first, remove the duplicate cards.
 
 	bool has_done_action = false;
 
 	
 
+	//first, remove the duplicate cards.
 
 	std::unique_copy(hand_container.begin(), hand_container.end(), std::back_inserter(no_duplicate_cards));
 
@@ -237,6 +343,7 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 
 		bool meld_already_exists = false;
 
+		//if the natural meld vector is greater than 0.
 		if (natural_meld_vector.size() > 0) {
 				meld_already_exists = meld_of_card_exists(natural_meld_vector.at(0));
 		}
@@ -244,7 +351,7 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 		else {
 			meld_already_exists = false;
 		}
-																							//prevent an underflow.
+		//prevent an underflow, also 3 is the min needed for a canasta.
 		if (natural_meld_vector.size() >= 3 && !meld_already_exists && 
 			((int)hand_container.size()-amount_of_dangerous_cards>0) && 
 			!is_dangerous_card(natural_meld_vector.at(0),enemy_melds)) {
@@ -276,11 +383,7 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 			for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
 				if (natural_meld_vector.at(0).get_card_face() == meld_container.at(meld_pos).at(0).get_card_face()) {
 
-					int loop_size;
-					if (is_dangerous_card(natural_meld_vector.at(0), enemy_melds))
-						loop_size = natural_meld_vector.size();
-					else
-						loop_size = (int)natural_meld_vector.size() - amount_of_dangerous_cards;
+					int loop_size= natural_meld_vector.size();
 
 					for (int lay_off_pos = 0; lay_off_pos < loop_size; lay_off_pos++) {
 						has_done_action = true;
@@ -346,12 +449,12 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 	wild_cards_in_hand = player_hand.get_wild_cards_from_hand();
 	meld_container = player_hand.get_meld();
 
-	sort_melds(meld_container);
+	meld_container = sort_melds(meld_container);
 	for (int meld_pos = 0; meld_pos < meld_container.size(); meld_pos++) {
 		player_hand = get_player_hand();
 		wild_cards_in_hand = player_hand.get_wild_cards_from_hand();
 		meld_container = player_hand.get_meld();
-		sort_melds(meld_container);
+		meld_container = sort_melds(meld_container);
 		int absolute_meld_pos = get_absolute_pos_from_relative_meld(meld_container.at(meld_pos));
 		std::vector<Card> wild_cards_from_meld = player_hand.get_wild_cards_ignore_transfer(absolute_meld_pos);
 		
@@ -443,7 +546,27 @@ void Computer:: meld(std::vector<std::vector<Card>> enemy_melds)
 
 
 }
-
+/* *********************************************************************
+Function Name: draw
+Purpose: The Computer's strategy regarding the draw phase.
+Parameters:
+			 draw_decks: a Deck reference which represents the discard and stock pile from the Round.
+			 enemy_melds: a vector of vectors of Card which represents the enemy's melds.
+Algorithm:
+			1. If the CPU sees that the first card of the discard pile is meldable,
+			as well as the discard pile isn’t frozen, and that the CPU has a hand size greater than 5, it’ll draw from the discard pile.
+			2. If none of the above are true and the stock pile is empty, it’ll draw from the stock pile.
+			3. Otherwise, it’ll concede, saying it can’t draw from either piles, hence the game is over.
+Local variables: 
+			player_hand: a Hand representing the player's hand for comparisons. 
+			top_of_discard: A Card representing the top of the discard pile for which the Computer to see if it can draw from there.
+			can_meld: a bool which represents if the top of the discard pile is meldable with the hand.
+			can_meld_with_melds: a bool which represents if the top of the discard pile is meldable with the Computer's melds.
+			hand_is_not_small: a bool which represents if the hand is greater than 5 or not.
+			picked_up_discard: a vector of Cards which represents the discard pile being picked up after being drawn.
+Return Value: bool, representing if the game should end immeadiately if the Computer cannot draw.
+Assistance Received: none
+********************************************************************* */
 bool Computer::draw(Deck &draw_decks)
 {
 	Hand player_hand = get_player_hand();
@@ -489,23 +612,51 @@ bool Computer::draw(Deck &draw_decks)
 
 
 }
-
+/* *********************************************************************
+Function Name: print_player_type
+Purpose: Prints the Computer's player type.
+Parameters: none.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 void Computer::print_player_type()
 {
 	std::cout << "Computer";
 }
-
+/* *********************************************************************
+Function Name: choose_to_go_out
+Purpose: Give a decision as to if the Computer wants to go out.
+Parameters: none.
+Return Value: bool representing if the Computer chose to go out.
+Assistance Received: none
+********************************************************************* */
 bool Computer::choose_to_go_out()
 {
 	std::cout << "The computer chose to go out since it likes 100 point bonuses." << std::endl;
 	return true;
 }
 
+/* *********************************************************************
+Function Name: strategy
+Purpose: Overrides strategy for the Computer, and prints out a message stating it doesn't need it's own strategy.
+Parameters: 
+			 draw_decks: a Deck reference representing the discard and stock pile from Round.
+			 enemy_melds: a vector of vectors of Cards representing the enemy's melds.
+Return Value: none.
+Assistance Received: none
+********************************************************************* */
 void Computer::strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds)
 {
 	std::cout << "The computer has it's own strategy, so it doesn't need advice..." << std::endl;
 }
 
+/* *********************************************************************
+Function Name: get_player_type
+Purpose: returns the Computer's player type.
+Parameters: none.
+Return Value: string representing the Computer's player type.
+Assistance Received: none
+********************************************************************* */
 std::string Computer::get_player_type()
 {
 	return "Computer";

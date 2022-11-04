@@ -1,8 +1,8 @@
 /* ***********************************************************
 * Name:  Patrick Wierzbicki*
-* Project : Cansta P1*
-* Class : class numberand name here*
-* Date : 9/13/22*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
 *********************************************************** */
 #include "Card.h"
 
@@ -175,6 +175,16 @@ Card::Card(char face, char suit, std::string string_reprensentation, int point_v
 	this->has_transferred = false;
 }
 
+
+/* *********************************************************************
+Function Name: Card
+Purpose: The constructor for only being passed a string representation, which fills in the rest of it's
+			with the string representation.
+Parameters:
+				string_representation: a string which represents the string value of the Cards.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 Card::Card(std::string string_representation)
 {
 	this->string_representation = string_representation;
@@ -305,7 +315,8 @@ void Card::translate_to_symbolic_rep(int face, int suit) {
 			this->face = 'A';
 			break;
 		case 12:
-			//IMPORTANT NOTE: J is a Jack, not a Joker.
+			//IMPORTANT NOTE: J is a Jack, not a Joker. Joker's will 
+			//be added manually, as there are only 4.
 			this->face = 'J';
 			break;
 		case 13: 
@@ -467,6 +478,9 @@ Algorithm:
 			    For non numeric values, it'll return the number based on their position after being made in the Deck.
 				 In the case of J, depending on the suit of the card, it'll either be 12(Jack's numeric value)
 				 or 15 (Joker's numeric value).
+Local variables: 
+	int ascii_offset: a local variable representing 48, a constant to convert from char to int using
+	char arithmetic.
 Assistance Received: none
 ********************************************************************* */
 int Card::get_numeric_value() const
@@ -485,6 +499,8 @@ int Card::get_numeric_value() const
 	case '9':
 		return (int)face - ascii_offset;
 		break;
+	//the following cases are their numeric values after being added to the deck.
+	//note that J is shared by both Jack and Joker, so a ternary operator is used.
 	case 'X':
 		return 10;
 		break;
@@ -492,6 +508,7 @@ int Card::get_numeric_value() const
 		return 11;
 		break;
 	case 'J':
+		//check if it's a Joker or Jack by seeing it the suit is numeric(Jokers have a numeric suit).
 		return ((isdigit(suit)) ? 15 : 12);
 		break;
 	case 'Q': 
@@ -506,12 +523,26 @@ int Card::get_numeric_value() const
 	}
 	
 }
-
+/* *********************************************************************
+Function Name: set_has_transferred()
+Purpose: Sets the data member has_transferred.
+Parameters: bool has_transferred, which represents what to set the variable to.
+Return Value: none
+Assistance Received: none
+********************************************************************* */
 void Card::set_has_transferred(bool has_transferred)
 {
 	this->has_transferred = has_transferred;
 }
 
+
+/* *********************************************************************
+Function Name: operator == 
+Purpose: An overloaded equal operator for Card.
+Parameters: const Card card1 and card2, which both represent the operands being compared. 
+Return Value: a bool depending if card1(left hand side) is equal to card2 (right hand side).
+Assistance Received: none
+********************************************************************* */
 bool operator==(const Card card1, const Card card2)
 {
 	if (card1.get_card_string() == card2.get_card_string())
@@ -520,6 +551,14 @@ bool operator==(const Card card1, const Card card2)
 		return false;
 }
 
+/* *********************************************************************
+Function Name: operator <
+Purpose: An overloaded < operator for Card, which sorts by both point value, and if equal, by face.
+Parameters: const Card card1 and card2, which both represent the operands being compared.
+Return Value: a bool depending if card1(left hand side) is less than to card2 (right hand side)
+				  depending on either each card's point value or face.
+Assistance Received: none
+********************************************************************* */
 bool operator<(const Card card1, const Card card2)
 {
 	//might seem untuitive but remember that numbers are higher up on
@@ -542,6 +581,14 @@ bool operator<(const Card card1, const Card card2)
 	
 }
 
+/* *********************************************************************
+Function Name: operator >
+Purpose: An overloaded > operator for Card, which sorts by both point value, and if equal, by face.
+Parameters: const Card card1 and card2, which both represent the operands being compared.
+Return Value: a bool depending if card1(left hand side) is greater than to card2 (right hand side)
+				  depending on either each card's point value or face.
+Assistance Received: none
+********************************************************************* */
 bool operator>(const Card card1, const Card card2) {
 	int card_1_value = card1.get_numeric_value();
 	int card_2_value = card2.get_numeric_value();

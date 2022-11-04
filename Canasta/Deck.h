@@ -7,6 +7,12 @@
 *********************************************************** */
 #include <vector>
 #include <string>
+/* ***********************************************************
+* Name:  Patrick Wierzbicki*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
+*********************************************************** */
 #include "Card.h"
 #include <chrono>
 #include <random>
@@ -15,26 +21,35 @@
 class Deck {
 public:
 	Deck();
+	
+	
+	
 	void create_stock_pile();
 	void shuffle_stock();
+	
+	
 	Card draw_from_stock();
 	std::vector<Card> draw_from_discard();
-	void discard(Card discarded_card);
-	bool stock_is_empty();
-	bool discard_is_empty();
-	bool both_piles_are_empty();
-	bool get_discard_is_frozen();
-	Card get_top_discard_pile();
-	void print_stock_pile();
-	void print_top_of_discard_pile();
-	void print_discard_pile();
+	
+	
+	Card get_top_discard_pile() const;
+	bool stock_is_empty() const;
+	bool discard_is_empty( ) const ;
+	bool both_piles_are_empty() const ;
+	bool get_discard_is_frozen() const;
+	int get_size_of_discard() const;
+	
+	void print_stock_pile() const ;
+	void print_top_of_discard_pile() const ;
+	void print_discard_pile() const;
+	void print_top_of_stock() const;
+
+
 	void discard_push_front(Card pushed_card);
 	void set_discard_freeze(bool is_frozen);
 	void clear_discard();
-	int get_size_of_discard() const; 
 
-
-	void print_top_of_stock();
+	void discard(Card discarded_card);
 	void set_discard_pile(std::vector<Card> discard_pile);
 	void set_stock_pile(std::vector<Card> stock_pile);
 

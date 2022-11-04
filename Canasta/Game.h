@@ -1,3 +1,9 @@
+/* ***********************************************************
+* Name:  Patrick Wierzbicki*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
+*********************************************************** */
 #pragma once
 
 class Card;
@@ -28,14 +34,14 @@ class Human;
 class Game {
 public: 
 	Game();
+	~Game();
+	Game(const Game& other_game);
+	
 	void main_menu();
 	void choose_player_type();
 	void main_game();
 	void main_game(Round &loaded_round);
-	~Game();
-	Game(const Game& other_game);
 	void decide_winner();
-	//virtual void play();
 private: 
 	std::vector<Player*> players;
 	int round;

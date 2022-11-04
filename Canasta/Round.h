@@ -1,3 +1,9 @@
+/* ***********************************************************
+* Name:  Patrick Wierzbicki*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
+*********************************************************** */
 #pragma once
 
 class Player;
@@ -18,13 +24,9 @@ class Game;
 class Round {
 public: 
 	Round();
-	Round(Human player1, Human player2);
-	Round(Human player1, Computer player2);
 	Round(std::vector<Player*> players, int round_number);
 	Round(const Round& other_round);
 	~Round(); 
-
-
 
 
 	int coin_toss();
@@ -32,12 +34,14 @@ public:
 	void initial_draw();
 	int get_next_player() const;
 	void set_next_player(int next_player);
-	void output_round_info();
 	void sort_players_hands();
 	int pre_turn_menu();
 	void tally_score(); 
 	void set_round_number(int round_number);
 	std::vector<Player*> get_players();
+
+	void output_round_info() const;
+
 
 	bool load_game();
 	bool load_round_number(std::string round_string);

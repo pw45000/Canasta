@@ -23,9 +23,6 @@ public:
 
 	~Card();
 
-
-
-
 	void translate_to_symbolic_rep(int face, int value);
 	void calculate_point_value(char face, char value);
 	
@@ -54,7 +51,7 @@ private:
 	bool has_transferred;
 };
 
-//one of the only functions not added within the class. This is because we need a binary comparison.
+//Some functions not added within the class. This is because we need a binary comparison.
 bool operator== (const Card card1, const Card card2);
 bool operator< (const Card card1, const Card card2);
 bool operator> (const Card card1, const Card card2);

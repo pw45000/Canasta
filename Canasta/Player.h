@@ -1,3 +1,10 @@
+/* ***********************************************************
+* Name:  Patrick Wierzbicki*
+* Project : Canasta C++ Project 1*
+* Class : CMPS-366-01*
+* Date : 9/28/22*
+*********************************************************** */
+
 #pragma once
 
 
@@ -10,24 +17,34 @@ class Player {
 
 public:
 	Player();
-	int get_score();
-	Hand get_player_hand();
-	bool has_canasta();
-	bool hand_empty();
+	int get_score() const;
+	Hand get_player_hand() const;
+	bool has_canasta() const;
+	bool hand_empty() const;
+	bool can_go_out() const;
+	bool get_go_out_decision() const;
+	
+	std::vector<Card> get_wild_cards_from_vector(std::vector<Card> arbitrary_card_vect) const;
+	bool meld_of_card_exists(Card card_to_search) const;
+
+	int get_absolute_pos_from_relative_meld(std::vector<Card> arbitrary_meld_vect) const;
+
+	void print_vector(std::vector<Card> vector_to_print) const;
+	void print_meld(int meld_pos) const;
+	void temp_print_hand() const;
+
+	
 	void add_to_hand(Card card_to_be_added);
 	void add_to_hand(std::vector<Card> cards_to_be_added);
-	void create_special_meld(Card card_to_be_added);
+	bool create_special_meld(Card card_to_be_added);
 	bool create_meld(std::vector<Card> potential_meld);
 	bool create_meld(Card first, Card second, Card third);
 	void purge_red_threes();
-	
 	bool lay_off(Card addition, int meld_number);
 	bool transfer_card(Card wild_card, int wild_origin, int meld_number);
-	bool can_go_out();
 	bool remove_from_hand(Card discard_card);
 
 	void sort_hand();
-	void temp_print_hand();
 	
 	void clear_transfer_states();
 	void clear_hand();
@@ -38,15 +55,9 @@ public:
 	void set_hand(std::vector<Card> hand_container);
 	void clear_hand_and_meld();
 
-	void print_vector(std::vector<Card> vector_to_print);
-	void print_meld(int meld_pos);
-	int get_score_from_meld(int meld_pos);
 
-	void sort_melds(std::vector<std::vector<Card>> &melds_to_sort);
-	std::vector<Card> get_wild_cards_from_vector(std::vector<Card> arbitrary_card_vect);
-	bool meld_of_card_exists(Card card_to_search);
-	
-	int get_absolute_pos_from_relative_meld(std::vector<Card> arbitrary_meld_vect);
+
+	std::vector<std::vector<Card>> sort_melds(std::vector<std::vector<Card>> melds_to_sort) const;
 
 
 	virtual bool play(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
@@ -59,13 +70,12 @@ public:
 	virtual std::string get_player_type() = 0;
 	virtual void strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
 	
-	bool get_go_out_decision() const; 
 	void set_go_out_decision(bool go_out_decision); 
 	
 	bool go_out();
 
-	int get_dangerous_amount_of_cards(std::vector<std::vector<Card>> enemy_melds);
-	bool is_dangerous_card(Card potential_danger_card, std::vector<std::vector<Card>> enemy_melds);
+	int get_dangerous_amount_of_cards(std::vector<std::vector<Card>> enemy_melds) const;
+	bool is_dangerous_card(Card potential_danger_card, std::vector<std::vector<Card>> enemy_melds) const;
 
 private:
 	int score;
