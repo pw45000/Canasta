@@ -69,6 +69,9 @@ public:
 	virtual bool choose_to_go_out() = 0;
 	virtual std::string get_player_type() = 0;
 	virtual void strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) = 0;
+	void strategy_meld1(std::vector<std::vector<Card>> enemy_melds);
+	void strategy_draw(Deck& draw_decks);
+	void strategy_discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds);
 	
 	void set_go_out_decision(bool go_out_decision); 
 	
