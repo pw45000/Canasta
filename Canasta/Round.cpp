@@ -431,6 +431,12 @@ void Round::tally_score()
 	int player_2_pos = 1;
 	bool player_1_gone_out = players.at(player_1_pos)->get_go_out_decision();
 	bool player_2_gone_out = players.at(player_2_pos)->get_go_out_decision();
+
+	if (!player_1_gone_out && !player_2_gone_out) {
+		players.at(0)->strategy_meld(players.at(1)->get_player_hand().get_meld(), "Remeld");
+		players.at(1)->strategy_meld(players.at(0)->get_player_hand().get_meld(), "Remeld");
+	}
+
 	int player_1_score = players.at(player_1_pos)->get_player_hand().get_total_score(player_1_gone_out);
 	int player_2_score = players.at(player_2_pos)->get_player_hand().get_total_score(player_2_gone_out);
 

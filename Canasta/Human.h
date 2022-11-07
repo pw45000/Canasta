@@ -19,12 +19,12 @@ public:
 	void discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) override;
 	void print_player_type() override;
 	bool choose_to_go_out() override;
-	virtual std::string get_player_type() override;
+	virtual std::string get_player_type() const override;
 	void print_enemy_meld(std::vector<std::vector<Card>> enemy_meld) const;
 	void strategy(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) override;
-	void strategy_draw(Deck& draw_decks) const;
-	void strategy_meld(std::vector<std::vector<Card>> enemy_melds) const; 
-	void strategy_discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) const;
+	void advice_draw(Deck& draw_decks) const;
+	void advice_meld(std::vector<std::vector<Card>> enemy_melds) const; 
+	void advice_discard(Deck& draw_decks, std::vector<std::vector<Card>> enemy_melds) const;
 
 	std::vector<Card> validate_comma_input();
 };
